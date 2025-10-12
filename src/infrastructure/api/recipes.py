@@ -16,6 +16,16 @@ from src.infrastructure.api.dependencies import get_recipe_use_cases, get_curren
 router = APIRouter()
 
 
+@router.get("/public", response_model=List[RecipeResponseDTO])
+async def list_recipes_public(
+    limit: int = 100,
+    offset: int = 0,
+    recipe_use_cases: RecipeUseCases = Depends(get_recipe_use_cases)
+):
+    """List all recipes (public endpoint for testing)."""
+    return await recipe_use_cases.list_all_recipes(limit=limit, offset=offset)
+
+
 @router.post("/", response_model=RecipeResponseDTO, status_code=status.HTTP_201_CREATED)
 async def create_recipe(
     recipe_dto: RecipeCreateDTO,

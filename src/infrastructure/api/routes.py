@@ -32,8 +32,4 @@ api_router.include_router(users_router, prefix="/users", tags=["users"])
 api_router.include_router(recipes_router, prefix="/recipes", tags=["recipes"])
 api_router.include_router(jobs_router, prefix="/processing-jobs", tags=["processing-jobs"])
 
-# Add exception handlers
-api_router.add_exception_handler(RecipeExtractorException, recipe_extractor_exception_handler)
-api_router.add_exception_handler(RequestValidationError, validation_exception_handler)
-api_router.add_exception_handler(StarletteHTTPException, http_exception_handler)
-api_router.add_exception_handler(Exception, general_exception_handler)
+# Exception handlers are added to the main app in main.py

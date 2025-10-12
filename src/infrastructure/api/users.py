@@ -16,6 +16,16 @@ from src.infrastructure.api.dependencies import get_user_use_cases, get_current_
 router = APIRouter()
 
 
+@router.get("/public", response_model=List[UserResponseDTO])
+async def list_users_public(
+    limit: int = 100,
+    offset: int = 0,
+    user_use_cases: UserUseCases = Depends(get_user_use_cases)
+):
+    """List all users (public endpoint for testing)."""
+    return await user_use_cases.list_users(limit=limit, offset=offset)
+
+
 @router.post("/", response_model=UserResponseDTO, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user_dto: UserCreateDTO,
