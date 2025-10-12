@@ -6,11 +6,17 @@ from typing import List
 from uuid import UUID
 
 from src.domain.entities.recipe import Recipe
+from src.domain.entities.catalog_item import CatalogItem
+from src.domain.entities.recipe_item import RecipeItem
 from src.domain.repositories.recipe_repository import RecipeRepository
 from src.domain.repositories.user_repository import UserRepository
+from src.domain.repositories.catalog_item_repository import CatalogItemRepository
+from src.domain.repositories.recipe_item_repository import RecipeItemRepository
+from src.domain.value_objects.quantity import Quantity
 from src.application.dtos.recipe_dto import (
     RecipeCreateDTO, RecipeUpdateDTO, RecipeResponseDTO, 
-    RecipeListResponseDTO, RecipeSearchDTO
+    RecipeListResponseDTO, RecipeSearchDTO, RecipeIngredientDTO,
+    RecipeIngredientsResponseDTO, RecipeIngredientResponseDTO
 )
 from src.shared.exceptions import EntityNotFoundError, ValidationError
 
@@ -18,9 +24,17 @@ from src.shared.exceptions import EntityNotFoundError, ValidationError
 class RecipeUseCases:
     """Recipe use cases implementation."""
     
-    def __init__(self, recipe_repository: RecipeRepository, user_repository: UserRepository):
+    def __init__(
+        self, 
+        recipe_repository: RecipeRepository, 
+        user_repository: UserRepository,
+        catalog_item_repository: CatalogItemRepository,
+        recipe_item_repository: RecipeItemRepository
+    ):
         self._recipe_repository = recipe_repository
         self._user_repository = user_repository
+        self._catalog_item_repository = catalog_item_repository
+        self._recipe_item_repository = recipe_item_repository
     
     async def create_recipe(self, user_id: UUID, recipe_dto: RecipeCreateDTO) -> RecipeResponseDTO:
         """Create a new recipe."""
@@ -40,6 +54,10 @@ class RecipeUseCases:
         
         # Save to repository
         created_recipe = await self._recipe_repository.create(recipe)
+        
+        # Process ingredients if provided
+        if recipe_dto.ingredients:
+            await self._process_recipe_ingredients(created_recipe.id, recipe_dto.ingredients)
         
         return RecipeResponseDTO(
             recipe_id=created_recipe.id,
@@ -183,4 +201,66 @@ class RecipeUseCases:
             total=len(recipes),
             page=(offset // limit) + 1,
             size=limit
+        )
+    
+    async def _process_recipe_ingredients(self, recipe_id: UUID, ingredients: List[RecipeIngredientDTO]) -> None:
+        """Process recipe ingredients - find or create catalog items and link them."""
+        for ingredient in ingredients:
+            # Find or create catalog item
+            catalog_item = await self._find_or_create_catalog_item(ingredient.name)
+            
+            # Create quantity value object
+            quantity = Quantity(ingredient.quantity_value, ingredient.quantity_unit)
+            
+            # Create recipe item
+            recipe_item = RecipeItem(
+                recipe_id=recipe_id,
+                item_id=catalog_item.id,
+                quantity=quantity
+            )
+            
+            # Save recipe item
+            await self._recipe_item_repository.create(recipe_item)
+    
+    async def _find_or_create_catalog_item(self, name: str) -> CatalogItem:
+        """Find existing catalog item by name or create new one."""
+        # Normalize name for consistent searching and storage
+        normalized_name = name.strip().lower()
+        
+        # Try to find existing item with normalized name
+        existing_item = await self._catalog_item_repository.get_by_name(normalized_name)
+        if existing_item:
+            return existing_item
+        
+        # Create new catalog item with normalized name
+        new_item = CatalogItem(name=normalized_name)
+        return await self._catalog_item_repository.create(new_item)
+    
+    async def get_recipe_ingredients(self, recipe_id: UUID) -> RecipeIngredientsResponseDTO:
+        """Get ingredients for a specific recipe."""
+        # Verify recipe exists
+        recipe = await self._recipe_repository.get_by_id(recipe_id)
+        if not recipe:
+            raise EntityNotFoundError("Recipe", str(recipe_id))
+        
+        # Get recipe items (ingredients) for this recipe
+        recipe_items = await self._recipe_item_repository.get_by_recipe_id(recipe_id)
+        
+        # Convert to response DTOs
+        ingredients = []
+        for item in recipe_items:
+            # Get catalog item details
+            catalog_item = await self._catalog_item_repository.get_by_id(item.item_id)
+            if catalog_item:
+                ingredients.append(RecipeIngredientResponseDTO(
+                    recipe_item_id=item.id,
+                    ingredient_name=catalog_item.name,
+                    quantity_value=item.quantity.value if item.quantity else 0,
+                    quantity_unit=item.quantity.unit if item.quantity else ""
+                ))
+        
+        return RecipeIngredientsResponseDTO(
+            recipe_id=recipe_id,
+            ingredients=ingredients,
+            total=len(ingredients)
         )

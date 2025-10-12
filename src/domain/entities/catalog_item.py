@@ -20,7 +20,8 @@ class CatalogItem:
     ):
         """Initialize CatalogItem entity."""
         self._id = item_id or uuid4()
-        self._name = name
+        # Normalize name during initialization
+        self._name = name.strip().lower() if name else ""
         self._last_used = last_used
     
     @property
@@ -39,11 +40,12 @@ class CatalogItem:
         return self._last_used
     
     def set_name(self, name: str) -> None:
-        """Set item name with validation."""
+        """Set item name with validation and normalization."""
         if not name or not name.strip():
             raise ValidationError("Item name cannot be empty")
         
-        self._name = name.strip()
+        # Normalize name: strip whitespace and convert to lowercase
+        self._name = name.strip().lower()
     
     def update_last_used(self) -> None:
         """Update last used timestamp to now."""

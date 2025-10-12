@@ -58,10 +58,12 @@ def get_user_use_cases(
 
 def get_recipe_use_cases(
     recipe_repo: Annotated[RecipeRepositoryImpl, Depends(get_recipe_repository)],
-    user_repo: Annotated[UserRepositoryImpl, Depends(get_user_repository)]
+    user_repo: Annotated[UserRepositoryImpl, Depends(get_user_repository)],
+    catalog_item_repo: Annotated[CatalogItemRepositoryImpl, Depends(get_catalog_item_repository)],
+    recipe_item_repo: Annotated[RecipeItemRepositoryImpl, Depends(get_recipe_item_repository)]
 ) -> RecipeUseCases:
     """Get recipe use cases."""
-    return RecipeUseCases(recipe_repo, user_repo)
+    return RecipeUseCases(recipe_repo, user_repo, catalog_item_repo, recipe_item_repo)
 
 
 def get_processing_job_use_cases(

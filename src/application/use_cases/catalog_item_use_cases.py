@@ -23,13 +23,16 @@ class CatalogItemUseCases:
     
     async def create_catalog_item(self, item_dto: CatalogItemCreateDTO) -> CatalogItemResponseDTO:
         """Create a new catalog item."""
-        # Check if item with same name already exists
-        existing_item = await self._catalog_item_repository.get_by_name(item_dto.name)
+        # Normalize name for consistent checking and storage
+        normalized_name = item_dto.name.strip().lower()
+        
+        # Check if item with same normalized name already exists
+        existing_item = await self._catalog_item_repository.get_by_name(normalized_name)
         if existing_item:
             raise ValidationError(f"Catalog item with name '{item_dto.name}' already exists")
         
-        # Create new catalog item
-        catalog_item = CatalogItem(name=item_dto.name)
+        # Create new catalog item with normalized name
+        catalog_item = CatalogItem(name=normalized_name)
         created_item = await self._catalog_item_repository.create(catalog_item)
         
         return CatalogItemResponseDTO(
@@ -58,11 +61,12 @@ class CatalogItemUseCases:
         
         # Check if new name conflicts with existing item
         if item_dto.name and item_dto.name != catalog_item.name:
-            existing_item = await self._catalog_item_repository.get_by_name(item_dto.name)
+            normalized_name = item_dto.name.strip().lower()
+            existing_item = await self._catalog_item_repository.get_by_name(normalized_name)
             if existing_item:
                 raise ValidationError(f"Catalog item with name '{item_dto.name}' already exists")
         
-        # Update item
+        # Update item with normalized name
         if item_dto.name:
             catalog_item.set_name(item_dto.name)
         

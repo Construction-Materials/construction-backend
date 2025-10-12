@@ -53,8 +53,11 @@ class CatalogItemRepositoryImpl(CatalogItemRepository):
     async def get_by_name(self, name: str) -> Optional[CatalogItem]:
         """Get catalog item by name."""
         try:
+            # Normalize name for consistent searching
+            normalized_name = name.strip().lower()
+            
             result = await self._session.execute(
-                select(CatalogItemModel).where(CatalogItemModel.name == name)
+                select(CatalogItemModel).where(CatalogItemModel.name == normalized_name)
             )
             item_model = result.scalar_one_or_none()
             
@@ -115,9 +118,12 @@ class CatalogItemRepositoryImpl(CatalogItemRepository):
     async def search_by_name(self, name: str, limit: int = 100, offset: int = 0) -> List[CatalogItem]:
         """Search catalog items by name."""
         try:
+            # Normalize search term for consistent searching
+            normalized_name = name.strip().lower()
+            
             result = await self._session.execute(
                 select(CatalogItemModel)
-                .where(CatalogItemModel.name.ilike(f"%{name}%"))
+                .where(CatalogItemModel.name.ilike(f"%{normalized_name}%"))
                 .offset(offset)
                 .limit(limit)
                 .order_by(CatalogItemModel.last_used.desc().nulls_last(), CatalogItemModel.name)
@@ -131,8 +137,11 @@ class CatalogItemRepositoryImpl(CatalogItemRepository):
     async def exists_by_name(self, name: str) -> bool:
         """Check if catalog item exists by name."""
         try:
+            # Normalize name for consistent checking
+            normalized_name = name.strip().lower()
+            
             result = await self._session.execute(
-                select(CatalogItemModel.item_id).where(CatalogItemModel.name == name)
+                select(CatalogItemModel.item_id).where(CatalogItemModel.name == normalized_name)
             )
             return result.scalar_one_or_none() is not None
         except Exception as e:

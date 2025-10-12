@@ -8,7 +8,7 @@ from uuid import UUID
 
 from src.application.dtos.recipe_dto import (
     RecipeCreateDTO, RecipeUpdateDTO, RecipeResponseDTO, 
-    RecipeListResponseDTO, RecipeSearchDTO
+    RecipeListResponseDTO, RecipeSearchDTO, RecipeIngredientsResponseDTO
 )
 from src.application.use_cases.recipe_use_cases import RecipeUseCases
 from src.infrastructure.api.dependencies import get_recipe_use_cases, get_current_user
@@ -44,6 +44,15 @@ async def get_recipe(
 ):
     """Get recipe by ID."""
     return await recipe_use_cases.get_recipe_by_id(recipe_id)
+
+
+@router.get("/{recipe_id}/ingredients", response_model=RecipeIngredientsResponseDTO)
+async def get_recipe_ingredients(
+    recipe_id: UUID,
+    recipe_use_cases: RecipeUseCases = Depends(get_recipe_use_cases)
+):
+    """Get ingredients for a specific recipe."""
+    return await recipe_use_cases.get_recipe_ingredients(recipe_id)
 
 
 @router.put("/{recipe_id}", response_model=RecipeResponseDTO)
