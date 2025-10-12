@@ -28,12 +28,32 @@ class CatalogItemResponseDTO(BaseModel):
         from_attributes = True
 
 
+class CatalogItemSimpleDTO(BaseModel):
+    """DTO for catalog item without last_used field (for sorted lists)."""
+    item_id: UUID = Field(..., description="Item ID")
+    name: str = Field(..., description="Item name")
+    
+    class Config:
+        from_attributes = True
+
+
 class CatalogItemListResponseDTO(BaseModel):
     """DTO for catalog item list response."""
     items: List[CatalogItemResponseDTO] = Field(..., description="List of catalog items")
     total: int = Field(..., description="Total number of items")
     page: int = Field(..., description="Current page")
     size: int = Field(..., description="Page size")
+
+
+class CatalogItemSimpleListResponseDTO(BaseModel):
+    """DTO for catalog item list response without last_used field (for sorted lists)."""
+    items: List[CatalogItemSimpleDTO] = Field(..., description="List of catalog items")
+    total: int = Field(..., description="Total number of items")
+    page: int = Field(..., description="Current page")
+    size: int = Field(..., description="Page size")
+    has_next: bool = Field(..., description="Whether there is a next page")
+    has_prev: bool = Field(..., description="Whether there is a previous page")
+    links: dict = Field(..., description="Navigation links")
 
 
 class CatalogItemSearchDTO(BaseModel):

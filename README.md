@@ -101,6 +101,16 @@ API będzie dostępne pod adresem: `http://localhost:8000`
 - `GET /api/v1/recipes/my/recipes` - Moje przepisy
 - `GET /api/v1/recipes/search` - Wyszukaj przepisy
 
+### Catalog Items (Składniki)
+
+- `GET /api/v1/catalog-items/` - Lista składników (posortowana według ostatniego użycia)
+- `GET /api/v1/catalog-items/public` - Publiczna lista składników (bez paginacji)
+- `GET /api/v1/catalog-items/search` - Wyszukaj składniki po nazwie
+- `POST /api/v1/catalog-items/` - Utwórz nowy składnik
+- `GET /api/v1/catalog-items/{item_id}` - Pobierz składnik po ID
+- `PUT /api/v1/catalog-items/{item_id}` - Aktualizuj składnik
+- `DELETE /api/v1/catalog-items/{item_id}` - Usuń składnik
+
 ### Processing Jobs
 
 - `POST /api/v1/processing-jobs/` - Utwórz zadanie przetwarzania
@@ -111,10 +121,14 @@ API będzie dostępne pod adresem: `http://localhost:8000`
 
 ## Dokumentacja API
 
-Automatyczna dokumentacja Swagger/OpenAPI dostępna pod:
+### Automatyczna dokumentacja
 
 - `http://localhost:8000/docs` (Swagger UI)
 - `http://localhost:8000/redoc` (ReDoc)
+
+### Szczegółowa dokumentacja
+
+- [Catalog Items API](docs/CATALOG_ITEMS_API.md) - Kompletna dokumentacja API dla składników
 
 ## Testy
 

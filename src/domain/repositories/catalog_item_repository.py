@@ -51,3 +51,8 @@ class CatalogItemRepository(ABC):
     async def exists_by_name(self, name: str) -> bool:
         """Check if catalog item exists by name."""
         pass
+    
+    @abstractmethod
+    async def count_all(self) -> int:
+        """Count total number of catalog items."""
+        pass

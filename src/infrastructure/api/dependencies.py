@@ -17,6 +17,7 @@ from src.infrastructure.database.repositories.processing_job_repository_impl imp
 from src.application.use_cases.user_use_cases import UserUseCases
 from src.application.use_cases.recipe_use_cases import RecipeUseCases
 from src.application.use_cases.processing_job_use_cases import ProcessingJobUseCases
+from src.application.use_cases.catalog_item_use_cases import CatalogItemUseCases
 from src.shared.exceptions import EntityNotFoundError
 
 # Security
@@ -69,6 +70,13 @@ def get_processing_job_use_cases(
 ) -> ProcessingJobUseCases:
     """Get processing job use cases."""
     return ProcessingJobUseCases(job_repo, user_repo)
+
+
+def get_catalog_item_use_cases(
+    catalog_item_repo: Annotated[CatalogItemRepositoryImpl, Depends(get_catalog_item_repository)]
+) -> CatalogItemUseCases:
+    """Get catalog item use cases."""
+    return CatalogItemUseCases(catalog_item_repo)
 
 
 async def get_current_user(

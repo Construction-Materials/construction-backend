@@ -5,7 +5,7 @@ CatalogItem Repository Implementation (Adapter).
 from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, func
 from datetime import datetime
 
 from src.domain.entities.catalog_item import CatalogItem
@@ -104,7 +104,7 @@ class CatalogItemRepositoryImpl(CatalogItemRepository):
                 select(CatalogItemModel)
                 .offset(offset)
                 .limit(limit)
-                .order_by(CatalogItemModel.name)
+                .order_by(CatalogItemModel.last_used.desc().nulls_last(), CatalogItemModel.name)
             )
             item_models = result.scalars().all()
             
@@ -120,7 +120,7 @@ class CatalogItemRepositoryImpl(CatalogItemRepository):
                 .where(CatalogItemModel.name.ilike(f"%{name}%"))
                 .offset(offset)
                 .limit(limit)
-                .order_by(CatalogItemModel.name)
+                .order_by(CatalogItemModel.last_used.desc().nulls_last(), CatalogItemModel.name)
             )
             item_models = result.scalars().all()
             
@@ -137,6 +137,16 @@ class CatalogItemRepositoryImpl(CatalogItemRepository):
             return result.scalar_one_or_none() is not None
         except Exception as e:
             raise DatabaseError(f"Failed to check catalog item existence: {str(e)}") from e
+    
+    async def count_all(self) -> int:
+        """Count total number of catalog items."""
+        try:
+            result = await self._session.execute(
+                select(func.count(CatalogItemModel.item_id))
+            )
+            return result.scalar() or 0
+        except Exception as e:
+            raise DatabaseError(f"Failed to count catalog items: {str(e)}") from e
     
     def _to_domain(self, item_model: CatalogItemModel) -> CatalogItem:
         """Convert SQLAlchemy model to domain entity."""

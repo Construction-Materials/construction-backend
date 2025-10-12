@@ -66,7 +66,15 @@ class TestMockDataIntegration:
         response = test_client_with_mock_data.get("/api/v1/catalog-items")
         
         assert response.status_code == 200
-        items = response.json()
+        data = response.json()
+        
+        # Check response structure
+        assert "items" in data
+        assert "total" in data
+        assert "page" in data
+        assert "size" in data
+        
+        items = data["items"]
         
         # Should have 10 catalog items from mock data
         assert len(items) == 10
@@ -80,7 +88,7 @@ class TestMockDataIntegration:
         
         # Check all items have required fields
         for item in items:
-            assert "id" in item
+            assert "item_id" in item
             assert "name" in item
             assert "last_used" in item
     
