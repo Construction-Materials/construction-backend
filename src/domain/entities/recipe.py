@@ -18,6 +18,7 @@ class Recipe:
         user_id: UUID = None,
         title: str = "",
         external_url: Optional[str] = None,
+        image_url: Optional[str] = None,
         preparation_steps: str = "",
         prep_time_minutes: int = 0,
         created_at: Optional[datetime] = None
@@ -30,6 +31,7 @@ class Recipe:
         self._user_id = user_id
         self._title = title
         self._external_url = external_url
+        self._image_url = image_url
         self._preparation_steps = preparation_steps
         self._prep_time_minutes = prep_time_minutes
         self._created_at = created_at or datetime.utcnow()
@@ -53,6 +55,11 @@ class Recipe:
     def external_url(self) -> Optional[str]:
         """Get external URL."""
         return self._external_url
+    
+    @property
+    def image_url(self) -> Optional[str]:
+        """Get image URL."""
+        return self._image_url
     
     @property
     def preparation_steps(self) -> str:

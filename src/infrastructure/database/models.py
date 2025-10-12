@@ -37,6 +37,7 @@ class RecipeModel(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False, index=True)
     title = Column(String(255), nullable=False)
     external_url = Column(String(2048), nullable=True)
+    image_url = Column(String(500), nullable=True)
     preparation_steps = Column(Text, nullable=False, default="")
     prep_time_minutes = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)

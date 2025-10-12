@@ -4,6 +4,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440002",
     "title": "Klasyczne naleśniki",
     "external_url": "https://example.com/nalesniki",
+    "image_url": "https://source.unsplash.com/400x300/?pancakes",
     "preparation_steps": "1. Wymieszaj mąkę z jajkami\n2. Dodaj mleko i wymieszaj na gładką masę\n3. Smaż na patelni z masłem\n4. Podawaj z dżemem lub owocami",
     "prep_time_minutes": 30,
     "created_at": "2024-02-15T10:30:00Z"
@@ -13,6 +14,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440003",
     "title": "Spaghetti Carbonara",
     "external_url": "https://example.com/carbonara",
+    "image_url": "https://source.unsplash.com/400x300/?pasta",
     "preparation_steps": "1. Ugotuj makaron al dente\n2. Usmaż boczek na patelni\n3. Wymieszaj jajka z parmezanem\n4. Połącz makaron z boczkiem i sosem jajecznym",
     "prep_time_minutes": 25,
     "created_at": "2024-02-20T18:45:00Z"
@@ -22,6 +24,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440004",
     "title": "Zupa pomidorowa",
     "external_url": null,
+    "image_url": "https://source.unsplash.com/400x300/?tomato-soup",
     "preparation_steps": "1. Usmaż cebulę i czosnek\n2. Dodaj pomidory i gotuj 20 minut\n3. Zmiksuj na gładką zupę\n4. Dopraw solą i pieprzem",
     "prep_time_minutes": 45,
     "created_at": "2024-02-25T12:15:00Z"
@@ -31,6 +34,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440005",
     "title": "Kurczak w sosie śmietanowym",
     "external_url": "https://example.com/kurczak-smietana",
+    "image_url": "https://source.unsplash.com/400x300/?chicken",
     "preparation_steps": "1. Pokrój kurczaka na kawałki\n2. Usmaż na oleju\n3. Dodaj śmietanę i gotuj 15 minut\n4. Dopraw solą i pieprzem",
     "prep_time_minutes": 40,
     "created_at": "2024-03-01T16:20:00Z"
@@ -40,6 +44,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440006",
     "title": "Sałatka grecka",
     "external_url": null,
+    "image_url": "https://source.unsplash.com/400x300/?greek-salad",
     "preparation_steps": "1. Pokrój pomidory i ogórki\n2. Dodaj oliwki i ser feta\n3. Skrop oliwą z oliwek\n4. Dopraw solą i oregano",
     "prep_time_minutes": 15,
     "created_at": "2024-03-05T14:30:00Z"
@@ -49,6 +54,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440007",
     "title": "Pierogi ruskie",
     "external_url": "https://example.com/pierogi-ruskie",
+    "image_url": "https://source.unsplash.com/400x300/?dumplings",
     "preparation_steps": "1. Przygotuj ciasto na pierogi\n2. Zrób farsz z twarogu i ziemniaków\n3. Ulep pierogi\n4. Gotuj w osolonej wodzie",
     "prep_time_minutes": 90,
     "created_at": "2024-03-08T11:45:00Z"
@@ -58,6 +64,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440002",
     "title": "Chleb domowy",
     "external_url": null,
+    "image_url": "https://source.unsplash.com/400x300/?bread",
     "preparation_steps": "1. Wymieszaj mąkę z drożdżami\n2. Dodaj wodę i sól\n3. Wyrabiaj ciasto 10 minut\n4. Piecz w piekarniku 40 minut",
     "prep_time_minutes": 120,
     "created_at": "2024-03-12T09:20:00Z"
@@ -67,6 +74,7 @@
     "user_id": "550e8400-e29b-41d4-a716-446655440003",
     "title": "Tort czekoladowy",
     "external_url": "https://example.com/tort-czekoladowy",
+    "image_url": "https://source.unsplash.com/400x300/?chocolate-cake",
     "preparation_steps": "1. Przygotuj ciasto czekoladowe\n2. Upiecz w formie\n3. Przygotuj krem czekoladowy\n4. Udekoruj tort",
     "prep_time_minutes": 150,
     "created_at": "2024-03-15T13:10:00Z"

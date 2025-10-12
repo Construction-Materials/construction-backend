@@ -123,6 +123,7 @@ class RecipeUseCases:
                     user_id=recipe.user_id,
                     title=recipe.title,
                     external_url=recipe.external_url,
+                    image_url=recipe.image_url,
                     preparation_steps=recipe.preparation_steps,
                     prep_time_minutes=recipe.prep_time_minutes,
                     created_at=recipe.created_at
@@ -149,6 +150,7 @@ class RecipeUseCases:
                     user_id=recipe.user_id,
                     title=recipe.title,
                     external_url=recipe.external_url,
+                    image_url=recipe.image_url,
                     preparation_steps=recipe.preparation_steps,
                     prep_time_minutes=recipe.prep_time_minutes,
                     created_at=recipe.created_at
@@ -171,6 +173,7 @@ class RecipeUseCases:
                     user_id=recipe.user_id,
                     title=recipe.title,
                     external_url=recipe.external_url,
+                    image_url=recipe.image_url,
                     preparation_steps=recipe.preparation_steps,
                     prep_time_minutes=recipe.prep_time_minutes,
                     created_at=recipe.created_at

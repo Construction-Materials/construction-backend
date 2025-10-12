@@ -12,6 +12,7 @@ class RecipeCreateDTO(BaseModel):
     """DTO for creating a new recipe."""
     title: str = Field(..., min_length=1, max_length=255, description="Recipe title")
     external_url: Optional[HttpUrl] = Field(None, description="Source URL")
+    image_url: Optional[HttpUrl] = Field(None, description="Recipe image URL")
     preparation_steps: str = Field(default="", description="Preparation steps")
     prep_time_minutes: int = Field(default=0, ge=0, description="Preparation time in minutes")
 
@@ -20,6 +21,7 @@ class RecipeUpdateDTO(BaseModel):
     """DTO for updating recipe."""
     title: Optional[str] = Field(None, min_length=1, max_length=255, description="Recipe title")
     external_url: Optional[HttpUrl] = Field(None, description="Source URL")
+    image_url: Optional[HttpUrl] = Field(None, description="Recipe image URL")
     preparation_steps: Optional[str] = Field(None, description="Preparation steps")
     prep_time_minutes: Optional[int] = Field(None, ge=0, description="Preparation time in minutes")
 
@@ -30,6 +32,7 @@ class RecipeResponseDTO(BaseModel):
     user_id: UUID = Field(..., description="Owner user ID")
     title: str = Field(..., description="Recipe title")
     external_url: Optional[str] = Field(None, description="Source URL")
+    image_url: Optional[str] = Field(None, description="Recipe image URL")
     preparation_steps: str = Field(..., description="Preparation steps")
     prep_time_minutes: int = Field(..., description="Preparation time in minutes")
     created_at: datetime = Field(..., description="Creation timestamp")

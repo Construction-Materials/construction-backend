@@ -83,6 +83,7 @@ class MockDataLoader:
                 user_id=UUID(recipe_data["user_id"]),
                 title=recipe_data["title"],
                 external_url=recipe_data["external_url"],
+                image_url=recipe_data.get("image_url"),
                 preparation_steps=recipe_data["preparation_steps"],
                 prep_time_minutes=recipe_data["prep_time_minutes"],
                 created_at=datetime.fromisoformat(recipe_data["created_at"].replace("Z", "+00:00"))

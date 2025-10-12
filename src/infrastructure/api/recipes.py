@@ -23,7 +23,8 @@ async def list_recipes_public(
     recipe_use_cases: RecipeUseCases = Depends(get_recipe_use_cases)
 ):
     """List all recipes (public endpoint for testing)."""
-    return await recipe_use_cases.list_all_recipes(limit=limit, offset=offset)
+    result = await recipe_use_cases.list_all_recipes(limit=limit, offset=offset)
+    return result.recipes
 
 
 @router.post("/", response_model=RecipeResponseDTO, status_code=status.HTTP_201_CREATED)
