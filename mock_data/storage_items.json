@@ -1,0 +1,267 @@
+[
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440001",
+    "quantity_value": 500.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "quantity_value": 300.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440004",
+    "quantity_value": 50.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440027",
+    "quantity_value": 1.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440008",
+    "quantity_value": 2.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440009",
+    "quantity_value": 12.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440010",
+    "quantity_value": 8.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440012",
+    "quantity_value": 15.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440015",
+    "quantity_value": 30.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440016",
+    "quantity_value": 20.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440018",
+    "quantity_value": 25.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440001",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440019",
+    "quantity_value": 12.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440002",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440001",
+    "quantity_value": 200.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440002",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440006",
+    "quantity_value": 150.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440002",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440015",
+    "quantity_value": 15.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440002",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440024",
+    "quantity_value": 10.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440001",
+    "quantity_value": 800.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "quantity_value": 600.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440005",
+    "quantity_value": 30.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440007",
+    "quantity_value": 3.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440008",
+    "quantity_value": 4.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440009",
+    "quantity_value": 20.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440010",
+    "quantity_value": 15.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440012",
+    "quantity_value": 50.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440013",
+    "quantity_value": 30.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440017",
+    "quantity_value": 100.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440018",
+    "quantity_value": 40.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440003",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440020",
+    "quantity_value": 25.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440004",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "quantity_value": 400.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440004",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440013",
+    "quantity_value": 20.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440004",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440017",
+    "quantity_value": 80.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440004",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440019",
+    "quantity_value": 15.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440001",
+    "quantity_value": 200.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "quantity_value": 150.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "quantity_value": 1.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440009",
+    "quantity_value": 10.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440010",
+    "quantity_value": 6.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440012",
+    "quantity_value": 8.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440015",
+    "quantity_value": 20.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440016",
+    "quantity_value": 15.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440018",
+    "quantity_value": 12.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440019",
+    "quantity_value": 8.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440005",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440021",
+    "quantity_value": 5.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440001",
+    "quantity_value": 100.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "quantity_value": 50.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440003",
+    "quantity_value": 25.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440009",
+    "quantity_value": 4.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440012",
+    "quantity_value": 6.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440014",
+    "quantity_value": 4.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440015",
+    "quantity_value": 10.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440018",
+    "quantity_value": 8.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440022",
+    "quantity_value": 2.00
+  },
+  {
+    "storage_id": "dd0e8400-e29b-41d4-a716-446655440006",
+    "material_id": "cc0e8400-e29b-41d4-a716-446655440023",
+    "quantity_value": 50.00
+  }
+]

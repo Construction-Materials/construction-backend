@@ -25,7 +25,7 @@ async def setup_database():
 
 def main():
     """Main seeding function."""
-    print("🌱 Recipe AI Extractor - Database Seeding")
+    print("🌱 Construction Manager - Database Seeding")
     print("=" * 50)
     
     # Check command line arguments

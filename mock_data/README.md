@@ -1,78 +1,95 @@
 # Mock Data - Dane Testowe
 
-Ten katalog zawiera przykładowe dane testowe dla aplikacji RecepieScraperBackend w formacie JSON.
+Ten katalog zawiera przykładowe dane testowe dla aplikacji Construction Manager w formacie JSON, skupione na instalacjach elektrycznych i instalacjach na budowie.
 
 ## Struktura plików
 
-### users.json
+### categories.json
 
-Zawiera 7 użytkowników z następującymi polami:
+Zawiera 8 kategorii materiałów elektrycznych i instalacyjnych:
 
-- `id` - UUID użytkownika
-- `email` - adres email
-- `password_hash` - hash hasła (bcrypt)
-- `is_admin` - czy użytkownik jest administratorem
+- `id` - UUID kategorii
+- `name` - nazwa kategorii
+
+Kategorie obejmują: Przewody i kable, Osprzęt elektryczny, Rozdzielnice i bezpieczniki, Oświetlenie, Puszki i korytka, Gniazda i wyłączniki, Instalacje niskiego napięcia, Akcesoria instalacyjne.
+
+### constructions.json
+
+Zawiera 6 konstrukcji/budów związanych z instalacjami elektrycznymi:
+
+- `id` - UUID konstrukcji
+- `name` - nazwa konstrukcji/budowy
+- `description` - opis konstrukcji (zawiera szczegóły instalacji elektrycznej)
+- `status` - status konstrukcji (active, in_progress, inactive, archived, deleted)
 - `created_at` - data utworzenia (ISO 8601)
 
-### catalog_items.json
+Przykłady: instalacje elektryczne w domach, modernizacje instalacji biurowych, instalacje oświetlenia przemysłowego, remonty instalacji mieszkaniowych, instalacje garażowe, instalacje zewnętrzne.
 
-Zawiera 10 składników z następującymi polami:
+### materials.json
 
-- `id` - UUID składnika
-- `name` - nazwa składnika
-- `last_used` - data ostatniego użycia (ISO 8601)
+Zawiera 26 materiałów elektrycznych i instalacyjnych z następującymi polami:
 
-### recipes.json
-
-Zawiera 8 przepisów z następującymi polami:
-
-- `id` - UUID przepisu
-- `user_id` - UUID właściciela przepisu (foreign key do users)
-- `title` - tytuł przepisu
-- `external_url` - zewnętrzny URL (może być null)
-- `preparation_steps` - kroki przygotowania
-- `prep_time_minutes` - czas przygotowania w minutach
+- `id` - UUID materiału
+- `category_id` - UUID kategorii (foreign key do categories)
+- `name` - nazwa materiału
+- `description` - opis materiału
+- `unit` - jednostka miary (meters, kilograms, cubic_meters, liters, pieces, other)
 - `created_at` - data utworzenia (ISO 8601)
 
-### recipe_items.json
+Materiały obejmują: przewody i kable (YDY, YKY), rozdzielnice, wyłączniki różnicowoprądowe i nadprądowe, lampy LED, puszki podtynkowe, korytka kablowe, gniazda, wyłączniki światła, transformatory, akcesoria instalacyjne.
 
-Zawiera 33 połączenia przepis-składnik z następującymi polami:
+### storages.json
 
-- `id` - UUID połączenia
-- `recipe_id` - UUID przepisu (foreign key do recipes)
-- `item_id` - UUID składnika (foreign key do catalog_items)
-- `quantity` - obiekt z ilością:
-  - `value` - wartość liczbowa
-  - `unit` - jednostka miary
+Zawiera 6 magazynów z następującymi polami:
+
+- `id` - UUID magazynu
+- `construction_id` - UUID konstrukcji (foreign key do constructions)
+- `name` - nazwa magazynu
+- `created_at` - data utworzenia (ISO 8601)
+
+Magazyny są przypisane do konkretnych konstrukcji związanych z instalacjami elektrycznymi.
+
+### storage_items.json
+
+Zawiera 50+ pozycji magazynowych z następującymi polami:
+
+- `storage_id` - UUID magazynu (foreign key do storages)
+- `material_id` - UUID materiału (foreign key do materials)
+- `quantity_value` - wartość ilości (Decimal)
+
+Pozycje magazynowe zawierają materiały elektryczne w odpowiednich ilościach dla każdego magazynu.
 
 ## Powiązania między encjami
 
-- **Users → Recipes**: Jeden użytkownik może mieć wiele przepisów
-- **Recipes → RecipeItems**: Jeden przepis może mieć wiele składników
-- **CatalogItems → RecipeItems**: Jeden składnik może być w wielu przepisach
+- **Categories → Materials**: Jedna kategoria może mieć wiele materiałów
+- **Constructions → Storages**: Jedna konstrukcja może mieć wiele magazynów
+- **Storages → StorageItems**: Jeden magazyn może mieć wiele pozycji
+- **Materials → StorageItems**: Jeden materiał może być w wielu magazynach
 
 ## Przykładowe użycie
 
 ```python
 import json
 
-# Wczytanie danych użytkowników
-with open('mock_data/users.json', 'r', encoding='utf-8') as f:
-    users = json.load(f)
+# Wczytanie danych kategorii
+with open('mock_data/categories.json', 'r', encoding='utf-8') as f:
+    categories = json.load(f)
 
-# Wczytanie przepisów
-with open('mock_data/recipes.json', 'r', encoding='utf-8') as f:
-    recipes = json.load(f)
+# Wczytanie konstrukcji
+with open('mock_data/constructions.json', 'r', encoding='utf-8') as f:
+    constructions = json.load(f)
 
-# Znalezienie przepisów użytkownika
-user_id = "550e8400-e29b-41d4-a716-446655440002"
-user_recipes = [r for r in recipes if r['user_id'] == user_id]
+# Znalezienie materiałów w kategorii przewodów
+category_id = "aa0e8400-e29b-41d4-a716-446655440001"
+category_materials = [m for m in materials if m['category_id'] == category_id]
 ```
 
 ## Uwagi
 
-- Wszystkie hasła to przykładowy hash bcrypt dla hasła "password123"
 - Daty są w formacie ISO 8601 (UTC)
 - UUID są w formacie standardowym
-- Nazwy składników i przepisów są w języku polskim
-- Ilości składników są realistyczne dla polskiej kuchni
+- Nazwy materiałów i konstrukcji są w języku polskim
+- Ilości materiałów są realistyczne dla polskich instalacji elektrycznych
+- Statusy konstrukcji: active, in_progress, inactive, archived, deleted
+- Jednostki miary: meters (przewody, kable, korytka), pieces (osprzęt, lampy, puszki), liters (nie używane w danych elektrycznych)
+- Wszystkie dane są związane z instalacjami elektrycznymi i instalacjami na budowie

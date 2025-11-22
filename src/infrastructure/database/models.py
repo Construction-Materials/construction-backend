@@ -69,6 +69,7 @@ class MaterialModel(Base):
 
     # Relationships
     category = relationship("CategoryModel", back_populates="materials")
+    storage_items = relationship("StorageItemModel", back_populates="material")
 
 class StorageModel(Base):
     """Storage SQLAlchemy model."""

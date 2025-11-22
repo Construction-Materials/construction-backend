@@ -1,0 +1,218 @@
+[
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440001",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440001",
+    "name": "Przewód YDY 3x2.5mm²",
+    "description": "Przewód elektryczny YDY 3x2.5mm², długość 100m, do instalacji wewnętrznych",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440002",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440001",
+    "name": "Przewód YDY 3x1.5mm²",
+    "description": "Przewód elektryczny YDY 3x1.5mm², długość 100m, do obwodów oświetleniowych",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440003",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440001",
+    "name": "Kabel YKY 5x2.5mm²",
+    "description": "Kabel zasilający YKY 5x2.5mm², długość 50m, do instalacji zewnętrznych i podziemnych",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440004",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440001",
+    "name": "Przewód YDY 3x4mm²",
+    "description": "Przewód elektryczny YDY 3x4mm², długość 50m, do obwodów zasilających o większej mocy",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440005",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440001",
+    "name": "Kabel YKY 3x6mm²",
+    "description": "Kabel zasilający YKY 3x6mm², długość 30m, do głównego zasilania",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440006",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440001",
+    "name": "Przewód YDYp 3x2.5mm²",
+    "description": "Przewód płaski YDYp 3x2.5mm², długość 100m, do instalacji podtynkowych",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440027",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440002",
+    "name": "Rozdzielnica mieszkaniowa 12 modułów",
+    "description": "Rozdzielnica elektryczna 12 modułów, biała, z szyną PE i N",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440007",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440002",
+    "name": "Rozdzielnica przemysłowa 24 moduły",
+    "description": "Rozdzielnica elektryczna 24 moduły, IP65, do zastosowań przemysłowych",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440008",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440003",
+    "name": "Wyłącznik różnicowoprądowy 25A/30mA",
+    "description": "Wyłącznik różnicowoprądowy 25A, prąd zadziałania 30mA, typ AC",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440009",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440003",
+    "name": "Wyłącznik nadprądowy 16A",
+    "description": "Wyłącznik nadprądowy jednobiegunowy 16A, charakterystyka C",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440010",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440003",
+    "name": "Wyłącznik nadprądowy 20A",
+    "description": "Wyłącznik nadprądowy jednobiegunowy 20A, charakterystyka C",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440011",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440003",
+    "name": "Wyłącznik nadprądowy 25A",
+    "description": "Wyłącznik nadprądowy jednobiegunowy 25A, charakterystyka C",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440012",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440004",
+    "name": "Lampa LED sufitowa 36W",
+    "description": "Lampa LED sufitowa 36W, barwa ciepła 3000K, IP20",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440013",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440004",
+    "name": "Lampa LED przemysłowa 100W",
+    "description": "Lampa LED przemysłowa 100W, barwa neutralna 4000K, IP65",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440014",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440004",
+    "name": "Lampa LED zewnętrzna 50W",
+    "description": "Lampa LED zewnętrzna 50W, barwa ciepła 3000K, IP65, z czujnikiem ruchu",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440015",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440005",
+    "name": "Puszka podtynkowa Ø60mm",
+    "description": "Puszka podtynkowa okrągła Ø60mm, głębokość 40mm, biała",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440016",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440005",
+    "name": "Puszka podtynkowa 80x80mm",
+    "description": "Puszka podtynkowa kwadratowa 80x80mm, głębokość 40mm, biała",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440017",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440005",
+    "name": "Korytko kablowe 40x40mm",
+    "description": "Korytko kablowe PVC 40x40mm, długość 2m, białe",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440018",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440006",
+    "name": "Gniazdo 230V z uziemieniem",
+    "description": "Gniazdo elektryczne 230V z uziemieniem, biała ramka, pojedyncze",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440019",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440006",
+    "name": "Wyłącznik światła jednoklawiszowy",
+    "description": "Wyłącznik światła jednoklawiszowy, biały, z podświetleniem",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440020",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440006",
+    "name": "Wyłącznik światła dwuklawiszowy",
+    "description": "Wyłącznik światła dwuklawiszowy, biały, do sterowania dwoma obwodami",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440021",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440006",
+    "name": "Gniazdo USB 2x2.4A",
+    "description": "Gniazdo z portami USB 2x2.4A, biała ramka, do montażu w puszce",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440022",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440007",
+    "name": "Transformator 12V/50W",
+    "description": "Transformator niskiego napięcia 12V/50W, do oświetlenia ogrodowego",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440023",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440007",
+    "name": "Przewód niskiego napięcia 2x1.5mm²",
+    "description": "Przewód niskiego napięcia 2x1.5mm², długość 50m, do oświetlenia 12V",
+    "unit": "meters",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440024",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440008",
+    "name": "Taśma izolacyjna PVC",
+    "description": "Taśma izolacyjna PVC, szerokość 19mm, długość 20m, czarna",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440025",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440008",
+    "name": "Złączka skręcana 2.5mm²",
+    "description": "Złączka skręcana do przewodów 2.5mm², izolowana, kolorowa",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  },
+  {
+    "id": "cc0e8400-e29b-41d4-a716-446655440026",
+    "category_id": "aa0e8400-e29b-41d4-a716-446655440008",
+    "name": "Końcówka tulejkowa 2.5mm²",
+    "description": "Końcówka tulejkowa do przewodów 2.5mm², miedziana, izolowana",
+    "unit": "pieces",
+    "created_at": "2024-01-10T08:00:00Z"
+  }
+]

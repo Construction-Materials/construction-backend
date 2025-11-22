@@ -1,0 +1,44 @@
+[
+  {
+    "id": "bb0e8400-e29b-41d4-a716-446655440001",
+    "name": "Instalacja elektryczna - Dom ul. Słoneczna 15",
+    "description": "Kompleksowa instalacja elektryczna w domu jednorodzinnym 120m², obejmująca rozdzielnię główną, obwody gniazdowe, oświetleniowe i specjalne",
+    "status": "in_progress",
+    "created_at": "2024-01-15T10:30:00Z"
+  },
+  {
+    "id": "bb0e8400-e29b-41d4-a716-446655440002",
+    "name": "Modernizacja instalacji - Biurowiec Centrum",
+    "description": "Modernizacja instalacji elektrycznej w biurowcu 5-piętrowym, wymiana rozdzielnic, nowe obwody oświetleniowe LED, instalacja systemu zarządzania energią",
+    "status": "active",
+    "created_at": "2024-02-01T14:20:00Z"
+  },
+  {
+    "id": "bb0e8400-e29b-41d4-a716-446655440003",
+    "name": "Instalacja oświetlenia - Warsztat Przemysłowa 8",
+    "description": "Instalacja oświetlenia przemysłowego w hali warsztatowej 500m², oświetlenie LED wysokiej mocy, sterowanie automatyczne, obwody zasilające maszyny",
+    "status": "in_progress",
+    "created_at": "2024-02-10T09:15:00Z"
+  },
+  {
+    "id": "bb0e8400-e29b-41d4-a716-446655440004",
+    "name": "Remont instalacji elektrycznej - Mieszkanie Kwiatowa 22/5",
+    "description": "Kompleksowy remont instalacji elektrycznej w mieszkaniu 65m², wymiana przewodów, nowe gniazda i wyłączniki, modernizacja rozdzielni mieszkaniowej",
+    "status": "active",
+    "created_at": "2024-02-20T16:45:00Z"
+  },
+  {
+    "id": "bb0e8400-e29b-41d4-a716-446655440005",
+    "name": "Instalacja elektryczna - Garaż dwustanowiskowy",
+    "description": "Instalacja elektryczna w garażu, oświetlenie, gniazda do ładowania pojazdów elektrycznych, zasilanie bramy automatycznej, rozdzielnia garażowa",
+    "status": "inactive",
+    "created_at": "2024-03-01T11:30:00Z"
+  },
+  {
+    "id": "bb0e8400-e29b-41d4-a716-446655440006",
+    "name": "Instalacja zewnętrzna - Oświetlenie ogrodowe",
+    "description": "Instalacja oświetlenia zewnętrznego w ogrodzie, lampy solarne i zasilane z sieci, sterowanie automatyczne, bezpieczne napięcie 12V i 230V",
+    "status": "archived",
+    "created_at": "2024-03-05T13:20:00Z"
+  }
+]

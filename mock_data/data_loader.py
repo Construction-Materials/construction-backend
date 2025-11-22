@@ -15,7 +15,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.infrastructure.database.models import (
-    UserModel, RecipeModel, CatalogItemModel, RecipeItemModel
+    CategoryModel,
+    ConstructionModel,
+    MaterialModel,
+    StorageModel,
+    StorageItemModel,
+    ConstructionStatus,
+    UnitEnum
 )
 from src.infrastructure.database.connection import Base
 from src.shared.config import settings
@@ -34,82 +40,93 @@ class MockDataLoader:
         print("🔄 Ładowanie mock data...")
         
         # Load in correct order (respecting foreign keys)
-        self._load_users()
-        self._load_catalog_items()
-        self._load_recipes()
-        self._load_recipe_items()
+        self._load_categories()
+        self._load_constructions()
+        self._load_materials()
+        self._load_storages()
+        self._load_storage_items()
         
         print("✅ Mock data załadowane pomyślnie!")
     
-    def _load_users(self) -> None:
-        """Load users from JSON."""
-        users_data = self._load_json_file("users.json")
+    def _load_categories(self) -> None:
+        """Load categories from JSON."""
+        categories_data = self._load_json_file("categories.json")
         
-        for user_data in users_data:
-            user = UserModel(
-                user_id=UUID(user_data["id"]),
-                email=user_data["email"],
-                password_hash=user_data["password_hash"],
-                is_admin=user_data["is_admin"],
-                created_at=datetime.fromisoformat(user_data["created_at"].replace("Z", "+00:00"))
+        for category_data in categories_data:
+            category = CategoryModel(
+                category_id=UUID(category_data["id"]),
+                name=category_data["name"]
             )
-            self.db_session.add(user)
+            self.db_session.add(category)
         
         self.db_session.commit()
-        print(f"✅ Załadowano {len(users_data)} użytkowników")
+        print(f"✅ Załadowano {len(categories_data)} kategorii")
     
-    def _load_catalog_items(self) -> None:
-        """Load catalog items from JSON."""
-        items_data = self._load_json_file("catalog_items.json")
+    def _load_constructions(self) -> None:
+        """Load constructions from JSON."""
+        constructions_data = self._load_json_file("constructions.json")
         
-        for item_data in items_data:
-            item = CatalogItemModel(
-                item_id=UUID(item_data["id"]),
-                name=item_data["name"],
-                last_used=datetime.fromisoformat(item_data["last_used"].replace("Z", "+00:00")) if item_data["last_used"] else None
+        for construction_data in constructions_data:
+            construction = ConstructionModel(
+                construction_id=UUID(construction_data["id"]),
+                name=construction_data["name"],
+                description=construction_data["description"],
+                status=ConstructionStatus(construction_data["status"]),
+                created_at=datetime.fromisoformat(construction_data["created_at"].replace("Z", "+00:00"))
             )
-            self.db_session.add(item)
+            self.db_session.add(construction)
         
         self.db_session.commit()
-        print(f"✅ Załadowano {len(items_data)} składników")
+        print(f"✅ Załadowano {len(constructions_data)} konstrukcji")
     
-    def _load_recipes(self) -> None:
-        """Load recipes from JSON."""
-        recipes_data = self._load_json_file("recipes.json")
+    def _load_materials(self) -> None:
+        """Load materials from JSON."""
+        materials_data = self._load_json_file("materials.json")
         
-        for recipe_data in recipes_data:
-            recipe = RecipeModel(
-                recipe_id=UUID(recipe_data["id"]),
-                user_id=UUID(recipe_data["user_id"]),
-                title=recipe_data["title"],
-                external_url=recipe_data["external_url"],
-                image_url=recipe_data.get("image_url"),
-                preparation_steps=recipe_data["preparation_steps"],
-                prep_time_minutes=recipe_data["prep_time_minutes"],
-                created_at=datetime.fromisoformat(recipe_data["created_at"].replace("Z", "+00:00"))
+        for material_data in materials_data:
+            material = MaterialModel(
+                material_id=UUID(material_data["id"]),
+                category_id=UUID(material_data["category_id"]),
+                name=material_data["name"],
+                description=material_data["description"],
+                unit=UnitEnum(material_data["unit"]),
+                created_at=datetime.fromisoformat(material_data["created_at"].replace("Z", "+00:00"))
             )
-            self.db_session.add(recipe)
+            self.db_session.add(material)
         
         self.db_session.commit()
-        print(f"✅ Załadowano {len(recipes_data)} przepisów")
+        print(f"✅ Załadowano {len(materials_data)} materiałów")
     
-    def _load_recipe_items(self) -> None:
-        """Load recipe items from JSON."""
-        recipe_items_data = self._load_json_file("recipe_items.json")
+    def _load_storages(self) -> None:
+        """Load storages from JSON."""
+        storages_data = self._load_json_file("storages.json")
         
-        for item_data in recipe_items_data:
-            quantity = item_data["quantity"]
-            recipe_item = RecipeItemModel(
-                recipe_item_id=UUID(item_data["id"]),
-                recipe_id=UUID(item_data["recipe_id"]),
-                item_id=UUID(item_data["item_id"]),
-                quantity_value=Decimal(str(quantity["value"])),
-                quantity_unit=quantity["unit"]
+        for storage_data in storages_data:
+            storage = StorageModel(
+                storage_id=UUID(storage_data["id"]),
+                construction_id=UUID(storage_data["construction_id"]),
+                name=storage_data["name"],
+                created_at=datetime.fromisoformat(storage_data["created_at"].replace("Z", "+00:00"))
             )
-            self.db_session.add(recipe_item)
+            self.db_session.add(storage)
         
         self.db_session.commit()
-        print(f"✅ Załadowano {len(recipe_items_data)} połączeń przepis-składnik")
+        print(f"✅ Załadowano {len(storages_data)} magazynów")
+    
+    def _load_storage_items(self) -> None:
+        """Load storage items from JSON."""
+        storage_items_data = self._load_json_file("storage_items.json")
+        
+        for item_data in storage_items_data:
+            storage_item = StorageItemModel(
+                storage_id=UUID(item_data["storage_id"]),
+                material_id=UUID(item_data["material_id"]),
+                quantity_value=Decimal(str(item_data["quantity_value"]))
+            )
+            self.db_session.add(storage_item)
+        
+        self.db_session.commit()
+        print(f"✅ Załadowano {len(storage_items_data)} pozycji magazynowych")
     
     def _load_json_file(self, filename: str) -> List[Dict[str, Any]]:
         """Load JSON data from file."""
@@ -123,10 +140,11 @@ class MockDataLoader:
         print("🗑️ Czyszczenie bazy danych...")
         
         # Delete in reverse order (respecting foreign keys)
-        self.db_session.query(RecipeItemModel).delete()
-        self.db_session.query(RecipeModel).delete()
-        self.db_session.query(CatalogItemModel).delete()
-        self.db_session.query(UserModel).delete()
+        self.db_session.query(StorageItemModel).delete()
+        self.db_session.query(StorageModel).delete()
+        self.db_session.query(MaterialModel).delete()
+        self.db_session.query(ConstructionModel).delete()
+        self.db_session.query(CategoryModel).delete()
         
         self.db_session.commit()
         print("✅ Baza danych wyczyszczona")
