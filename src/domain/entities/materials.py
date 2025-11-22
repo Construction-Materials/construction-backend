@@ -7,7 +7,7 @@ from typing import Optional, List
 from uuid import UUID, uuid4
 
 from src.shared.exceptions import ValidationError
-from src.infrastructure.database.models import CategoryModel
+from src.infrastructure.database.models import UnitEnum
 
 class Materials:
     """Materials domain entity."""
