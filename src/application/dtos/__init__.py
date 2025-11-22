@@ -8,3 +8,10 @@ from .construction_dto import (
     ConstructionListResponseDTO,
     ConstructionSearchDTO
 )
+from .material_dto import (
+    MaterialCreateDTO,
+    MaterialUpdateDTO,
+    MaterialResponseDTO,
+    MaterialListResponseDTO,
+    MaterialSearchDTO
+)
