@@ -7,6 +7,7 @@ from typing import Optional, List
 from uuid import UUID, uuid4
 
 from src.shared.exceptions import ValidationError
+from src.infrastructure.database.models import ConstructionStatus
 
 
 class Construction:
@@ -17,7 +18,7 @@ class Construction:
         construction_id: Optional[UUID] = None,
         name: str = "",
         description: str = "",
-        status: ConstructionStatus = ConstructionStatus.PENDING,
+        status: ConstructionStatus = ConstructionStatus.INACTIVE,
         created_at: Optional[datetime] = None
     ):
         """Initialize Construction entity."""
