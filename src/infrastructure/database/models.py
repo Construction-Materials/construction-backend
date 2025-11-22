@@ -18,6 +18,16 @@ class ConstructionStatus(str, Enum):
     ARCHIVED = "archived"
     DELETED = "deleted"
 
+class UnitEnum(str, Enum):
+    METERS = "meters"
+    KILOGRAMS = "kilograms"
+    CUBIC_METERS = "cubic_meters"
+    CUBIC_CENTIMETERS = "cubic_centimeters"
+    CUBIC_MILLIMETERS = "cubic_millimeters"
+    LITERS = "liters"
+    PIECES = "pieces"
+    OTHER = "other"
+
 class CategoryModel(Base):
     """Category SQLAlchemy model."""
     
@@ -54,7 +64,7 @@ class MaterialModel(Base):
 
     name = Column(String(100), nullable=False, index=True)
     description = Column(Text, nullable=False, default="")
-    unit = Column(String(50), nullable=False, default="")
+    unit = Column(Enum(UnitEnum), nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
 
     # Relationships
