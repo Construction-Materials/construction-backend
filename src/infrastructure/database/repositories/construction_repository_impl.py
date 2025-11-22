@@ -27,6 +27,7 @@ class ConstructionRepositoryImpl(ConstructionRepository):
                 name=construction.name,
                 description=construction.description,
                 address=construction.address,
+                start_date=construction.start_date,
                 status=construction.status,
                 created_at=construction.created_at
             )
@@ -66,6 +67,7 @@ class ConstructionRepositoryImpl(ConstructionRepository):
             construction_model.name = construction.name
             construction_model.description = construction.description
             construction_model.address = construction.address
+            construction_model.start_date = construction.start_date
             construction_model.status = construction.status
             
             await self._session.commit()
@@ -138,6 +140,7 @@ class ConstructionRepositoryImpl(ConstructionRepository):
             name=construction_model.name,
             description=construction_model.description,
             address=construction_model.address,
+            start_date=construction_model.start_date,
             status=ConstructionStatus(construction_model.status),
             created_at=construction_model.created_at
         )

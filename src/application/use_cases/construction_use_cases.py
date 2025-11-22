@@ -32,6 +32,7 @@ class ConstructionUseCases:
             name=construction_dto.name,
             description=construction_dto.description,
             address=construction_dto.address,
+            start_date=construction_dto.start_date,
             status=DomainStatus(construction_dto.status.value)
         )
         
@@ -43,6 +44,7 @@ class ConstructionUseCases:
             name=created_construction.name,
             description=created_construction.description,
             address=created_construction.address,
+            start_date=created_construction.start_date,
             status=ConstructionStatus(created_construction.status),
             created_at=created_construction.created_at
         )
@@ -58,6 +60,7 @@ class ConstructionUseCases:
             name=construction.name,
             description=construction.description,
             address=construction.address,
+            start_date=construction.start_date,
             status=ConstructionStatus(construction.status),
             created_at=construction.created_at
         )
@@ -77,6 +80,9 @@ class ConstructionUseCases:
         
         if construction_dto.address is not None:
             construction.set_address(construction_dto.address)
+        
+        if construction_dto.start_date is not None:
+            construction.set_start_date(construction_dto.start_date)
         
         if construction_dto.status is not None:
             construction._status = construction_dto.status.value

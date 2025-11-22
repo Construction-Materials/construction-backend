@@ -31,6 +31,7 @@ class ConstructionModel(Base):
     name = Column(String(100), nullable=False, index=True)
     description = Column(Text, nullable=False, default="")
     address = Column(String(255), nullable=False, default="")
+    start_date = Column(DateTime, nullable=True)
     status = Column(String(20), nullable=False, default="INACTIVE")
     created_at = Column(DateTime, default=func.now(), nullable=False)
     

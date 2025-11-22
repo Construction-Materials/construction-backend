@@ -19,6 +19,7 @@ class Construction:
         name: str = "",
         description: str = "",
         address: str = "",
+        start_date: Optional[datetime] = None,
         status: ConstructionStatus = ConstructionStatus.INACTIVE,
         created_at: Optional[datetime] = None
     ):
@@ -30,6 +31,7 @@ class Construction:
         self._name = name
         self._description = description
         self._address = address
+        self._start_date = start_date
         self._status = status
         self._created_at = created_at or datetime.utcnow()
     
@@ -54,6 +56,11 @@ class Construction:
         return self._address
     
     @property
+    def start_date(self) -> Optional[datetime]:
+        """Get construction start date."""
+        return self._start_date
+    
+    @property
     def status(self) -> ConstructionStatus:
         """Get construction status."""
         return self._status
@@ -63,12 +70,6 @@ class Construction:
         """Get creation timestamp."""
         return self._created_at
     
-    @property
-    def set_status(self, status: ConstructionStatus) -> None:
-        """Set construction status."""
-        self._status = status
-    
-    @property
     def set_name(self, name: str) -> None:
         """Set construction name with validation."""
         if not name or not name.strip():
@@ -87,16 +88,20 @@ class Construction:
         """Set construction address."""
         self._address = address.strip() if address else ""
     
+    def set_start_date(self, start_date: Optional[datetime]) -> None:
+        """Set construction start date."""
+        self._start_date = start_date
+    
     def set_status(self, status: ConstructionStatus) -> None:
         """Set construction status."""
         self._status = status   
     
     def __eq__(self, other) -> bool:
-        """Check equality with another recipe."""
-        if not isinstance(other, Recipe):
+        """Check equality with another construction."""
+        if not isinstance(other, Construction):
             return False
         return self._id == other._id
     
     def __hash__(self) -> int:
-        """Hash for recipe."""
+        """Hash for construction."""
         return hash(self._id)
