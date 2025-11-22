@@ -10,14 +10,14 @@ class Settings(BaseSettings):
     """Application settings."""
     
     # Application
-    app_name: str = "Recipe AI Extractor"
+    app_name: str = "Construction Manager"
     app_version: str = "1.0.0"
     debug: bool = False
     host: str = "0.0.0.0"
     port: int = 8000
     
     # Database
-    database_url: str = "sqlite:///./recipe_extractor.db"
+    database_url: str = "sqlite:///./construction_manager.db"
     database_url_dev: Optional[str] = None
     
     # Security
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
     aws_region: str = "us-east-1"
-    lambda_function_name: str = "recipe-ai-extractor"
+    lambda_function_name: str = "construction-manager"
     
     # AI Integration
     gemini_api_key: Optional[str] = None

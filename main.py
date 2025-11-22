@@ -35,8 +35,8 @@ def create_app() -> FastAPI:
     """Create and configure FastAPI application."""
     
     app = FastAPI(
-        title="Recipe AI Extractor",
-        description="Backend API for extracting recipes using AI with Hexagonal Architecture",
+        title="Construction Manager",
+        description="Backend API for managing construction projects with Hexagonal Architecture",
         version="1.0.0",
         lifespan=lifespan
     )
@@ -70,7 +70,7 @@ app = create_app()
 async def root():
     """Root endpoint."""
     return {
-        "message": "Recipe AI Extractor API",
+        "message": "Construction Manager API",
         "version": "1.0.0",
         "docs": "/docs"
     }
