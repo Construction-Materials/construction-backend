@@ -8,89 +8,82 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import uuid
-
+from enum import Enum
 from src.infrastructure.database.connection import Base
 
+class ConstructionStatus(str, Enum):
+    ACTIVE = "active"
+    IN_PROGRESS = "in_progress"
+    INACTIVE = "inactive"
+    ARCHIVED = "archived"
+    DELETED = "deleted"
 
-class UserModel(Base):
-    """User SQLAlchemy model."""
+class CategoryModel(Base):
+    """Category SQLAlchemy model."""
     
-    __tablename__ = "users"
+    __tablename__ = "categories"
     
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    password_hash = Column(String(255), nullable=False)
-    is_admin = Column(Boolean, default=False, nullable=False)
+    category_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(100), nullable=False, index=True)
     created_at = Column(DateTime, default=func.now(), nullable=False)
     
     # Relationships
-    recipes = relationship("RecipeModel", back_populates="user", cascade="all, delete-orphan")
-    processing_jobs = relationship("ProcessingJobModel", back_populates="user", cascade="all, delete-orphan")
+    materials = relationship("MaterialModel", back_populates="category", cascade="all, delete-orphan")
 
-
-class RecipeModel(Base):
-    """Recipe SQLAlchemy model."""
+class ConstructionModel(Base):
+    """Construction SQLAlchemy model."""
     
-    __tablename__ = "recipes"
+    __tablename__ = "constructions"
     
-    recipe_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False, index=True)
-    title = Column(String(255), nullable=False)
-    external_url = Column(String(2048), nullable=True)
-    image_url = Column(String(500), nullable=True)
-    preparation_steps = Column(Text, nullable=False, default="")
-    prep_time_minutes = Column(Integer, default=0, nullable=False)
+    construction_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(100), nullable=False, index=True)
+    description = Column(Text, nullable=False, default="")
+    status = Column(Enum(ConstructionStatus), nullable=False, default=ConstructionStatus.INACTIVE)
     created_at = Column(DateTime, default=func.now(), nullable=False)
     
     # Relationships
-    user = relationship("UserModel", back_populates="recipes")
-    recipe_items = relationship("RecipeItemModel", back_populates="recipe", cascade="all, delete-orphan")
-    processing_jobs = relationship("ProcessingJobModel", back_populates="recipe")
+    storages = relationship("StorageModel", back_populates="construction", cascade="all, delete-orphan")
 
+class MaterialModel(Base):
+    """Material SQLAlchemy model."""
+    
+    __tablename__ = "materials"
+    
+    material_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.category_id"), nullable=False, index=True)
 
-class CatalogItemModel(Base):
-    """Catalog item SQLAlchemy model."""
-    
-    __tablename__ = "catalog_items"
-    
-    item_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(100), unique=True, nullable=False, index=True)
-    last_used = Column(DateTime, nullable=True)
-    
+    name = Column(String(100), nullable=False, index=True)
+    description = Column(Text, nullable=False, default="")
+    unit = Column(String(50), nullable=False, default="")
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+
     # Relationships
-    recipe_items = relationship("RecipeItemModel", back_populates="catalog_item")
+    category = relationship("CategoryModel", back_populates="materials")
 
+class StorageModel(Base):
+    """Storage SQLAlchemy model."""
+    
+    __tablename__ = "storages"
+    
+    storage_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    construction_id = Column(UUID(as_uuid=True), ForeignKey("constructions.construction_id"), nullable=False, index=True)
+    name = Column(String(100), nullable=False, index=True)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
 
-class RecipeItemModel(Base):
-    """Recipe item SQLAlchemy model."""
+    # Relationships
+    construction = relationship("ConstructionModel", back_populates="storages")
+    storage_items = relationship("StorageItemModel", back_populates="storage", cascade="all, delete-orphan")
+
+class StorageItemModel(Base):
+    """Storage item SQLAlchemy model."""
     
-    __tablename__ = "recipe_items"
+    __tablename__ = "storage_items"
     
-    recipe_item_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    recipe_id = Column(UUID(as_uuid=True), ForeignKey("recipes.recipe_id"), nullable=False, index=True)
-    item_id = Column(UUID(as_uuid=True), ForeignKey("catalog_items.item_id"), nullable=False)
+    storage_id = Column(UUID(as_uuid=True), ForeignKey("storages.storage_id"), nullable=False, index=True)
+    material_id = Column(UUID(as_uuid=True), ForeignKey("materials.material_id"), nullable=False, index=True)
     quantity_value = Column(DECIMAL(8, 2), nullable=False)
-    quantity_unit = Column(String(50), nullable=False)
-    
-    # Relationships
-    recipe = relationship("RecipeModel", back_populates="recipe_items")
-    catalog_item = relationship("CatalogItemModel", back_populates="recipe_items")
-
-
-class ProcessingJobModel(Base):
-    """Processing job SQLAlchemy model."""
-    
-    __tablename__ = "processing_jobs"
-    
-    job_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False, index=True)
-    submitted_url = Column(String(2048), nullable=False)
-    status = Column(String(50), nullable=False, default="PENDING")
-    error_message = Column(Text, nullable=True)
-    result_recipe_id = Column(UUID(as_uuid=True), ForeignKey("recipes.recipe_id"), nullable=True)
     created_at = Column(DateTime, default=func.now(), nullable=False)
-    completed_at = Column(DateTime, nullable=True)
-    
+
     # Relationships
-    user = relationship("UserModel", back_populates="processing_jobs")
-    recipe = relationship("RecipeModel", back_populates="processing_jobs")
+    storage = relationship("StorageModel", back_populates="storage_items")
+    material = relationship("MaterialModel", back_populates="storage_items")
