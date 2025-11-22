@@ -8,25 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import uuid
-from enum import Enum
 from src.infrastructure.database.connection import Base
-
-class ConstructionStatus(str, Enum):
-    ACTIVE = "active"
-    IN_PROGRESS = "in_progress"
-    INACTIVE = "inactive"
-    ARCHIVED = "archived"
-    DELETED = "deleted"
-
-class UnitEnum(str, Enum):
-    METERS = "meters"
-    KILOGRAMS = "kilograms"
-    CUBIC_METERS = "cubic_meters"
-    CUBIC_CENTIMETERS = "cubic_centimeters"
-    CUBIC_MILLIMETERS = "cubic_millimeters"
-    LITERS = "liters"
-    PIECES = "pieces"
-    OTHER = "other"
 
 class CategoryModel(Base):
     """Category SQLAlchemy model."""
@@ -48,7 +30,7 @@ class ConstructionModel(Base):
     construction_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(100), nullable=False, index=True)
     description = Column(Text, nullable=False, default="")
-    status = Column(Enum(ConstructionStatus), nullable=False, default=ConstructionStatus.INACTIVE)
+    status = Column(String(20), nullable=False, default="INACTIVE")
     created_at = Column(DateTime, default=func.now(), nullable=False)
     
     # Relationships
@@ -64,7 +46,7 @@ class MaterialModel(Base):
 
     name = Column(String(100), nullable=False, index=True)
     description = Column(Text, nullable=False, default="")
-    unit = Column(Enum(UnitEnum), nullable=False)
+    unit = Column(String(30), nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
 
     # Relationships
@@ -90,8 +72,8 @@ class StorageItemModel(Base):
     
     __tablename__ = "storage_items"
     
-    storage_id = Column(UUID(as_uuid=True), ForeignKey("storages.storage_id"), nullable=False, index=True)
-    material_id = Column(UUID(as_uuid=True), ForeignKey("materials.material_id"), nullable=False, index=True)
+    storage_id = Column(UUID(as_uuid=True), ForeignKey("storages.storage_id"), primary_key=True, nullable=False)
+    material_id = Column(UUID(as_uuid=True), ForeignKey("materials.material_id"), primary_key=True, nullable=False)
     quantity_value = Column(DECIMAL(8, 2), nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
 
