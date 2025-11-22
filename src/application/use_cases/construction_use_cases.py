@@ -27,11 +27,12 @@ class ConstructionUseCases:
     async def create_construction(self, construction_dto: ConstructionCreateDTO) -> ConstructionResponseDTO:
         """Create a new construction."""
         # Create domain entity
-        from src.infrastructure.database.models import ConstructionStatus as ModelStatus
+        from src.domain.value_objects.construction_status import ConstructionStatus as DomainStatus
         construction = Construction(
             name=construction_dto.name,
             description=construction_dto.description,
-            status=ModelStatus(construction_dto.status.value)
+            address=construction_dto.address,
+            status=DomainStatus(construction_dto.status.value)
         )
         
         # Save to repository
@@ -41,6 +42,7 @@ class ConstructionUseCases:
             construction_id=created_construction.id,
             name=created_construction.name,
             description=created_construction.description,
+            address=created_construction.address,
             status=ConstructionStatus(created_construction.status),
             created_at=created_construction.created_at
         )
@@ -55,6 +57,7 @@ class ConstructionUseCases:
             construction_id=construction.id,
             name=construction.name,
             description=construction.description,
+            address=construction.address,
             status=ConstructionStatus(construction.status),
             created_at=construction.created_at
         )
@@ -71,6 +74,9 @@ class ConstructionUseCases:
         
         if construction_dto.description is not None:
             construction.set_description(construction_dto.description)
+        
+        if construction_dto.address is not None:
+            construction.set_address(construction_dto.address)
         
         if construction_dto.status is not None:
             construction._status = construction_dto.status.value

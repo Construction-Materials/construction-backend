@@ -30,6 +30,7 @@ class ConstructionModel(Base):
     construction_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(100), nullable=False, index=True)
     description = Column(Text, nullable=False, default="")
+    address = Column(String(255), nullable=False, default="")
     status = Column(String(20), nullable=False, default="INACTIVE")
     created_at = Column(DateTime, default=func.now(), nullable=False)
     

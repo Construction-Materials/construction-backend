@@ -13,6 +13,7 @@ class ConstructionCreateDTO(BaseModel):
     """DTO for creating a new construction."""
     name: str = Field(..., min_length=1, max_length=100, description="Construction name")
     description: str = Field(default="", description="Construction description")
+    address: str = Field(default="", max_length=255, description="Construction address")
     status: ConstructionStatus = Field(
         default=ConstructionStatus.INACTIVE,
         description="Construction status"
@@ -23,6 +24,7 @@ class ConstructionUpdateDTO(BaseModel):
     """DTO for updating construction."""
     name: Optional[str] = Field(None, min_length=1, max_length=100, description="Construction name")
     description: Optional[str] = Field(None, description="Construction description")
+    address: Optional[str] = Field(None, max_length=255, description="Construction address")
     status: Optional[ConstructionStatus] = Field(None, description="Construction status")
 
 
@@ -31,6 +33,7 @@ class ConstructionResponseDTO(BaseModel):
     construction_id: UUID = Field(..., description="Construction ID")
     name: str = Field(..., description="Construction name")
     description: str = Field(..., description="Construction description")
+    address: str = Field(..., description="Construction address")
     status: ConstructionStatus = Field(..., description="Construction status")
     created_at: datetime = Field(..., description="Creation timestamp")
     

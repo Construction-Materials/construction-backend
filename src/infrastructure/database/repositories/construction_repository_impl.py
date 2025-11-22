@@ -26,6 +26,7 @@ class ConstructionRepositoryImpl(ConstructionRepository):
                 construction_id=construction.id,
                 name=construction.name,
                 description=construction.description,
+                address=construction.address,
                 status=construction.status,
                 created_at=construction.created_at
             )
@@ -64,6 +65,7 @@ class ConstructionRepositoryImpl(ConstructionRepository):
             
             construction_model.name = construction.name
             construction_model.description = construction.description
+            construction_model.address = construction.address
             construction_model.status = construction.status
             
             await self._session.commit()
@@ -130,11 +132,13 @@ class ConstructionRepositoryImpl(ConstructionRepository):
     
     def _to_domain(self, construction_model: ConstructionModel) -> Construction:
         """Convert SQLAlchemy model to domain entity."""
+        from src.domain.value_objects.construction_status import ConstructionStatus
         return Construction(
             construction_id=construction_model.construction_id,
             name=construction_model.name,
             description=construction_model.description,
-            status=construction_model.status,
+            address=construction_model.address,
+            status=ConstructionStatus(construction_model.status),
             created_at=construction_model.created_at
         )
 

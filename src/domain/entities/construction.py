@@ -18,6 +18,7 @@ class Construction:
         construction_id: Optional[UUID] = None,
         name: str = "",
         description: str = "",
+        address: str = "",
         status: ConstructionStatus = ConstructionStatus.INACTIVE,
         created_at: Optional[datetime] = None
     ):
@@ -28,6 +29,7 @@ class Construction:
         self._id = construction_id or uuid4()
         self._name = name
         self._description = description
+        self._address = address
         self._status = status
         self._created_at = created_at or datetime.utcnow()
     
@@ -45,6 +47,11 @@ class Construction:
     def description(self) -> str:
         """Get construction description."""
         return self._description
+    
+    @property
+    def address(self) -> str:
+        """Get construction address."""
+        return self._address
     
     @property
     def status(self) -> ConstructionStatus:
@@ -75,6 +82,10 @@ class Construction:
             raise ValidationError("Construction description cannot be empty")
         
         self._description = description.strip()
+    
+    def set_address(self, address: str) -> None:
+        """Set construction address."""
+        self._address = address.strip() if address else ""
     
     def set_status(self, status: ConstructionStatus) -> None:
         """Set construction status."""
