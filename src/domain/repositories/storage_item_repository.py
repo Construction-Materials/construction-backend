@@ -18,6 +18,11 @@ class StorageItemRepository(ABC):
         pass
     
     @abstractmethod
+    async def create_bulk(self, storage_items: List[StorageItem]) -> List[StorageItem]:
+        """Create multiple storage items at once."""
+        pass
+    
+    @abstractmethod
     async def get_by_ids(self, storage_id: UUID, material_id: UUID) -> Optional[StorageItem]:
         """Get storage item by storage ID and material ID."""
         pass

@@ -38,6 +38,31 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             await self._session.rollback()
             raise DatabaseError(f"Failed to create storage item: {str(e)}") from e
     
+    async def create_bulk(self, storage_items: List[StorageItem]) -> List[StorageItem]:
+        """Create multiple storage items at once."""
+        try:
+            storage_item_models = [
+                StorageItemModel(
+                    storage_id=storage_item.storage_id,
+                    material_id=storage_item.material_id,
+                    quantity_value=storage_item.quantity_value,
+                    created_at=storage_item.created_at
+                )
+                for storage_item in storage_items
+            ]
+            
+            self._session.add_all(storage_item_models)
+            await self._session.commit()
+            
+            # Refresh all models to get database-generated values
+            for storage_item_model in storage_item_models:
+                await self._session.refresh(storage_item_model)
+            
+            return [self._to_domain(storage_item_model) for storage_item_model in storage_item_models]
+        except Exception as e:
+            await self._session.rollback()
+            raise DatabaseError(f"Failed to create storage items in bulk: {str(e)}") from e
+    
     async def get_by_ids(self, storage_id: UUID, material_id: UUID) -> Optional[StorageItem]:
         """Get storage item by storage ID and material ID."""
         try:

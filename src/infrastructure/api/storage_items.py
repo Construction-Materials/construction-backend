@@ -97,3 +97,19 @@ async def get_materials_by_storage(
     """Get list of materials (name, category, description, unit) for each storage item for given storage ID."""
     return await storage_item_use_cases.get_materials_by_storage_id(storage_id)
 
+
+@router.post("/construction/{construction_id}/bulk", response_model=List[StorageItemResponseDTO], status_code=status.HTTP_201_CREATED)
+async def create_storage_items_bulk_for_construction(
+    construction_id: UUID,
+    storage_item_dtos: List[StorageItemCreateDTO],
+    storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
+):
+    """Create multiple storage items at once for a given construction.
+    
+    Validates that all storage_ids in the request belong to the given construction_id.
+    """
+    return await storage_item_use_cases.create_storage_items_bulk_for_construction(
+        construction_id=construction_id,
+        storage_item_dtos=storage_item_dtos
+    )
+

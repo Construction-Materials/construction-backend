@@ -8,6 +8,7 @@ from decimal import Decimal
 
 from src.domain.entities.storage_item import StorageItem
 from src.domain.repositories.storage_item_repository import StorageItemRepository
+from src.domain.repositories.storage_repository import StorageRepository
 from src.application.dtos.storage_item_dto import (
     StorageItemCreateDTO,
     StorageItemUpdateDTO,
@@ -22,8 +23,9 @@ from src.shared.exceptions import EntityNotFoundError, ValidationError
 class StorageItemUseCases:
     """StorageItem use cases implementation."""
     
-    def __init__(self, storage_item_repository: StorageItemRepository):
+    def __init__(self, storage_item_repository: StorageItemRepository, storage_repository: StorageRepository = None):
         self._storage_item_repository = storage_item_repository
+        self._storage_repository = storage_repository
     
     async def create_storage_item(self, storage_item_dto: StorageItemCreateDTO) -> StorageItemResponseDTO:
         """Create a new storage item."""
@@ -181,4 +183,55 @@ class StorageItemUseCases:
                 for material in materials_data
             ]
         )
+    
+    async def create_storage_items_bulk_for_construction(
+        self, 
+        construction_id: UUID, 
+        storage_item_dtos: List[StorageItemCreateDTO]
+    ) -> List[StorageItemResponseDTO]:
+        """Create multiple storage items at once for a given construction.
+        
+        Validates that all storage_ids belong to the given construction_id.
+        """
+        if not self._storage_repository:
+            raise ValidationError("Storage repository is required for bulk operations")
+        
+        if not storage_item_dtos:
+            raise ValidationError("At least one storage item is required")
+        
+        # Get unique storage IDs from the request
+        storage_ids = list(set(dto.storage_id for dto in storage_item_dtos))
+        
+        # Validate that all storages belong to the given construction
+        for storage_id in storage_ids:
+            storage = await self._storage_repository.get_by_id(storage_id)
+            if not storage:
+                raise EntityNotFoundError("Storage", str(storage_id))
+            if storage.construction_id != construction_id:
+                raise ValidationError(
+                    f"Storage {storage_id} does not belong to construction {construction_id}"
+                )
+        
+        # Create domain entities
+        storage_items = [
+            StorageItem(
+                storage_id=storage_item_dto.storage_id,
+                material_id=storage_item_dto.material_id,
+                quantity_value=storage_item_dto.quantity_value
+            )
+            for storage_item_dto in storage_item_dtos
+        ]
+        
+        # Save to repository
+        created_storage_items = await self._storage_item_repository.create_bulk(storage_items)
+        
+        return [
+            StorageItemResponseDTO(
+                storage_id=storage_item.storage_id,
+                material_id=storage_item.material_id,
+                quantity_value=storage_item.quantity_value,
+                created_at=storage_item.created_at
+            )
+            for storage_item in created_storage_items
+        ]
 

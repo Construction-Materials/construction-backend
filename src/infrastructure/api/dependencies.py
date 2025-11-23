@@ -80,8 +80,9 @@ def get_storage_item_repository(db: Annotated[AsyncSession, Depends(get_async_db
 
 
 def get_storage_item_use_cases(
-    storage_item_repo: Annotated[StorageItemRepositoryImpl, Depends(get_storage_item_repository)]
+    storage_item_repo: Annotated[StorageItemRepositoryImpl, Depends(get_storage_item_repository)],
+    storage_repo: Annotated[StorageRepositoryImpl, Depends(get_storage_repository)]
 ) -> StorageItemUseCases:
     """Get storage item use cases."""
-    return StorageItemUseCases(storage_item_repo)
+    return StorageItemUseCases(storage_item_repo, storage_repo)
 
