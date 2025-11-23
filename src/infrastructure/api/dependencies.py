@@ -11,8 +11,10 @@ from uuid import UUID
 from src.infrastructure.database.connection import get_async_db
 from src.infrastructure.database.repositories.construction_repository_impl import ConstructionRepositoryImpl
 from src.infrastructure.database.repositories.material_repository_impl import MaterialRepositoryImpl
+from src.infrastructure.database.repositories.storage_repository_impl import StorageRepositoryImpl
 from src.application.use_cases.construction_use_cases import ConstructionUseCases
 from src.application.use_cases.material_use_cases import MaterialUseCases
+from src.application.use_cases.storage_use_cases import StorageUseCases
 
 from src.shared.exceptions import EntityNotFoundError
 
@@ -42,4 +44,16 @@ def get_material_use_cases(
 ) -> MaterialUseCases:
     """Get material use cases."""
     return MaterialUseCases(material_repo)
+
+
+def get_storage_repository(db: Annotated[AsyncSession, Depends(get_async_db)]) -> StorageRepositoryImpl:
+    """Get storage repository."""
+    return StorageRepositoryImpl(db)
+
+
+def get_storage_use_cases(
+    storage_repo: Annotated[StorageRepositoryImpl, Depends(get_storage_repository)]
+) -> StorageUseCases:
+    """Get storage use cases."""
+    return StorageUseCases(storage_repo)
 
