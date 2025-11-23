@@ -12,9 +12,11 @@ from src.infrastructure.database.connection import get_async_db
 from src.infrastructure.database.repositories.construction_repository_impl import ConstructionRepositoryImpl
 from src.infrastructure.database.repositories.material_repository_impl import MaterialRepositoryImpl
 from src.infrastructure.database.repositories.storage_repository_impl import StorageRepositoryImpl
+from src.infrastructure.database.repositories.category_repository_impl import CategoryRepositoryImpl
 from src.application.use_cases.construction_use_cases import ConstructionUseCases
 from src.application.use_cases.material_use_cases import MaterialUseCases
 from src.application.use_cases.storage_use_cases import StorageUseCases
+from src.application.use_cases.category_use_cases import CategoryUseCases
 
 from src.shared.exceptions import EntityNotFoundError
 
@@ -56,4 +58,16 @@ def get_storage_use_cases(
 ) -> StorageUseCases:
     """Get storage use cases."""
     return StorageUseCases(storage_repo)
+
+
+def get_category_repository(db: Annotated[AsyncSession, Depends(get_async_db)]) -> CategoryRepositoryImpl:
+    """Get category repository."""
+    return CategoryRepositoryImpl(db)
+
+
+def get_category_use_cases(
+    category_repo: Annotated[CategoryRepositoryImpl, Depends(get_category_repository)]
+) -> CategoryUseCases:
+    """Get category use cases."""
+    return CategoryUseCases(category_repo)
 

@@ -40,11 +40,10 @@ class Category:
         """Get creation timestamp."""
         return self._created_at
     
-    @property
     def set_name(self, name: str) -> None:
-        """Set construction name with validation."""
+        """Set category name with validation."""
         if not name or not name.strip():
-            raise ValidationError("Construction name cannot be empty")
+            raise ValidationError("Category name cannot be empty")
         
         self._name = name.strip()
     

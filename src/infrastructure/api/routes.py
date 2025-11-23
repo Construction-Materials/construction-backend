@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .constructions import router as constructions_router
 from .materials import router as materials_router
 from .storages import router as storages_router
+from .categories import router as categories_router
 from .error_handlers import (
     recipe_extractor_exception_handler,
     validation_exception_handler,
@@ -31,5 +32,6 @@ async def health_check():
 api_router.include_router(constructions_router, prefix="/constructions", tags=["constructions"])
 api_router.include_router(materials_router, prefix="/materials", tags=["materials"])
 api_router.include_router(storages_router, prefix="/storages", tags=["storages"])
+api_router.include_router(categories_router, prefix="/categories", tags=["categories"])
 
 # Exception handlers are added to the main app in main.py
