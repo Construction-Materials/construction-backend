@@ -12,7 +12,9 @@ from src.application.dtos.storage_item_dto import (
     StorageItemCreateDTO,
     StorageItemUpdateDTO,
     StorageItemResponseDTO,
-    StorageItemListResponseDTO
+    StorageItemListResponseDTO,
+    StorageItemMaterialDTO,
+    StorageItemMaterialListResponseDTO
 )
 from src.shared.exceptions import EntityNotFoundError, ValidationError
 
@@ -155,5 +157,28 @@ class StorageItemUseCases:
             total=len(storage_items),
             page=(offset // limit) + 1 if limit > 0 else 1,
             size=limit
+        )
+    
+    async def get_materials_by_storage_id(
+        self, 
+        storage_id: UUID
+    ) -> StorageItemMaterialListResponseDTO:
+        """Get materials with details by storage ID."""
+        materials_data = await self._storage_item_repository.get_materials_by_storage_id(storage_id)
+        
+        return StorageItemMaterialListResponseDTO(
+            materials=[
+                StorageItemMaterialDTO(
+                    storage_id=material['storage_id'],
+                    material_id=material['material_id'],
+                    name=material['name'],
+                    category=material['category'],
+                    description=material['description'],
+                    unit=material['unit'],
+                    quantity_value=material['quantity_value'],
+                    created_at=material['created_at']
+                )
+                for material in materials_data
+            ]
         )
 

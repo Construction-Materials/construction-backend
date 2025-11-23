@@ -9,7 +9,7 @@ from sqlalchemy import select, delete, func, and_
 
 from src.domain.entities.storage_item import StorageItem
 from src.domain.repositories.storage_item_repository import StorageItemRepository
-from src.infrastructure.database.models import StorageItemModel
+from src.infrastructure.database.models import StorageItemModel, MaterialModel, CategoryModel
 from src.shared.exceptions import DatabaseError
 
 
@@ -143,6 +143,43 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             return result.scalar() or 0
         except Exception as e:
             raise DatabaseError(f"Failed to count storage items: {str(e)}") from e
+    
+    async def get_materials_by_storage_id(self, storage_id: UUID) -> List[dict]:
+        """Get materials with details by storage ID."""
+        try:
+            result = await self._session.execute(
+                select(
+                    StorageItemModel.storage_id,
+                    StorageItemModel.material_id,
+                    MaterialModel.name,
+                    CategoryModel.name.label('category_name'),
+                    MaterialModel.description,
+                    MaterialModel.unit,
+                    StorageItemModel.quantity_value,
+                    StorageItemModel.created_at
+                )
+                .join(StorageItemModel, MaterialModel.material_id == StorageItemModel.material_id)
+                .join(CategoryModel, MaterialModel.category_id == CategoryModel.category_id)
+                .where(StorageItemModel.storage_id == storage_id)
+                .order_by(MaterialModel.name)
+            )
+            rows = result.all()
+            
+            return [
+                {
+                    'storage_id': row.storage_id,
+                    'material_id': row.material_id,
+                    'name': row.name,
+                    'category': row.category_name,
+                    'description': row.description,
+                    'unit': row.unit,
+                    'quantity_value': row.quantity_value,
+                    'created_at': row.created_at
+                }
+                for row in rows
+            ]
+        except Exception as e:
+            raise DatabaseError(f"Failed to get materials by storage ID: {str(e)}") from e
     
     def _to_domain(self, storage_item_model: StorageItemModel) -> StorageItem:
         """Convert SQLAlchemy model to domain entity."""

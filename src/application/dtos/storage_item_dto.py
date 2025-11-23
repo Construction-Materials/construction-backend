@@ -40,3 +40,24 @@ class StorageItemListResponseDTO(BaseModel):
     page: int = Field(..., description="Current page")
     size: int = Field(..., description="Page size")
 
+
+class StorageItemMaterialDTO(BaseModel):
+    """DTO for storage item with material details."""
+    storage_id: UUID = Field(..., description="Storage ID")
+    material_id: UUID = Field(..., description="Material ID")
+    name: str = Field(..., description="Material name")
+    category: str = Field(..., description="Category name")
+    description: str = Field(..., description="Material description")
+    unit: str = Field(..., description="Material unit")
+    quantity_value: Decimal = Field(..., description="Quantity value in storage")
+    created_at: datetime = Field(..., description="Creation timestamp")
+    
+    class Config:
+        """Enables to create instances from SQLAlchemy models."""
+        from_attributes = True
+
+
+class StorageItemMaterialListResponseDTO(BaseModel):
+    """DTO for storage item material list response."""
+    materials: List[StorageItemMaterialDTO] = Field(..., description="List of materials with details")
+

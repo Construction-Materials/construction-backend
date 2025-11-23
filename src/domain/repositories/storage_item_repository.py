@@ -46,4 +46,9 @@ class StorageItemRepository(ABC):
     async def count_all(self) -> int:
         """Count total number of storage items."""
         pass
+    
+    @abstractmethod
+    async def get_materials_by_storage_id(self, storage_id: UUID) -> List[dict]:
+        """Get materials with details by storage ID."""
+        pass
 

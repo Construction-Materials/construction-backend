@@ -10,7 +10,8 @@ from src.application.dtos.storage_item_dto import (
     StorageItemCreateDTO,
     StorageItemUpdateDTO,
     StorageItemResponseDTO,
-    StorageItemListResponseDTO
+    StorageItemListResponseDTO,
+    StorageItemMaterialListResponseDTO
 )
 from src.application.use_cases.storage_item_use_cases import StorageItemUseCases
 from src.infrastructure.api.dependencies import get_storage_item_use_cases
@@ -86,4 +87,13 @@ async def get_storage_items_by_material(
         limit=limit,
         offset=offset
     )
+
+
+@router.get("/storage/{storage_id}/materials", response_model=StorageItemMaterialListResponseDTO)
+async def get_materials_by_storage(
+    storage_id: UUID,
+    storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
+):
+    """Get list of materials (name, category, description, unit) for each storage item for given storage ID."""
+    return await storage_item_use_cases.get_materials_by_storage_id(storage_id)
 
