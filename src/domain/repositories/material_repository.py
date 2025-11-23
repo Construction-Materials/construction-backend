@@ -51,4 +51,9 @@ class MaterialRepository(ABC):
     async def count_all(self) -> int:
         """Count total number of materials."""
         pass
+    
+    @abstractmethod
+    async def get_by_construction_id(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> List[Materials]:
+        """Get materials by construction ID (through storages)."""
+        pass
 

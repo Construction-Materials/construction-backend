@@ -9,7 +9,7 @@ from sqlalchemy import select, delete, func
 
 from src.domain.entities.materials import Materials
 from src.domain.repositories.material_repository import MaterialRepository
-from src.infrastructure.database.models import MaterialModel
+from src.infrastructure.database.models import MaterialModel, StorageItemModel, StorageModel
 from src.shared.exceptions import DatabaseError
 
 
@@ -145,6 +145,25 @@ class MaterialRepositoryImpl(MaterialRepository):
             return result.scalar() or 0
         except Exception as e:
             raise DatabaseError(f"Failed to count materials: {str(e)}") from e
+    
+    async def get_by_construction_id(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> List[Materials]:
+        """Get materials by construction ID (through storages)."""
+        try:
+            result = await self._session.execute(
+                select(MaterialModel)
+                .join(StorageItemModel, MaterialModel.material_id == StorageItemModel.material_id)
+                .join(StorageModel, StorageItemModel.storage_id == StorageModel.storage_id)
+                .where(StorageModel.construction_id == construction_id)
+                .distinct()
+                .offset(offset)
+                .limit(limit)
+                .order_by(MaterialModel.name)
+            )
+            material_models = result.scalars().all()
+            
+            return [self._to_domain(material_model) for material_model in material_models]
+        except Exception as e:
+            raise DatabaseError(f"Failed to get materials by construction ID: {str(e)}") from e
     
     def _to_domain(self, material_model: MaterialModel) -> Materials:
         """Convert SQLAlchemy model to domain entity."""

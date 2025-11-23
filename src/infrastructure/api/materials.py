@@ -110,3 +110,14 @@ async def search_materials(
     search_dto = MaterialSearchDTO(query=query, page=page, size=size, category_id=category_uuid)
     return await material_use_cases.search_materials(search_dto)
 
+
+@router.get("/by-construction/{construction_id}", response_model=MaterialListResponseDTO)
+async def get_materials_by_construction(
+    construction_id: UUID,
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    material_use_cases: MaterialUseCases = Depends(get_material_use_cases)
+):
+    """Get materials by construction ID."""
+    return await material_use_cases.get_materials_by_construction(construction_id, limit=limit, offset=offset)
+

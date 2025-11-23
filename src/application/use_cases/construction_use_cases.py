@@ -94,6 +94,8 @@ class ConstructionUseCases:
             construction_id=updated_construction.id,
             name=updated_construction.name,
             description=updated_construction.description,
+            address=updated_construction.address,
+            start_date=updated_construction.start_date,
             status=ConstructionStatus(updated_construction.status),
             created_at=updated_construction.created_at
         )
@@ -117,6 +119,8 @@ class ConstructionUseCases:
                     construction_id=construction.id,
                     name=construction.name,
                     description=construction.description,
+                    address=construction.address,
+                    start_date=construction.start_date,
                     status=ConstructionStatus(construction.status),
                     created_at=construction.created_at
                 )
@@ -151,6 +155,8 @@ class ConstructionUseCases:
                     construction_id=construction.id,
                     name=construction.name,
                     description=construction.description,
+                    address=construction.address,
+                    start_date=construction.start_date,
                     status=ConstructionStatus(construction.status),
                     created_at=construction.created_at
                 )

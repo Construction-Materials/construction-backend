@@ -178,4 +178,26 @@ class MaterialUseCases:
             page=search_dto.page,
             size=search_dto.size
         )
+    
+    async def get_materials_by_construction(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> MaterialListResponseDTO:
+        """Get materials by construction ID."""
+        materials = await self._material_repository.get_by_construction_id(construction_id, limit=limit, offset=offset)
+        total = len(materials)  # Można dodać count_by_construction_id jeśli potrzebne
+        
+        return MaterialListResponseDTO(
+            materials=[
+                MaterialResponseDTO(
+                    material_id=material.id,
+                    category_id=material.category_id,
+                    name=material.name,
+                    description=material.description,
+                    unit=material.unit,
+                    created_at=material.created_at
+                )
+                for material in materials
+            ],
+            total=total,
+            page=(offset // limit) + 1 if limit > 0 else 1,
+            size=limit
+        )
 
