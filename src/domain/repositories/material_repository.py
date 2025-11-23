@@ -18,6 +18,11 @@ class MaterialRepository(ABC):
         pass
     
     @abstractmethod
+    async def create_bulk(self, materials: List[Materials]) -> List[Materials]:
+        """Create multiple materials at once."""
+        pass
+    
+    @abstractmethod
     async def get_by_id(self, material_id: UUID) -> Optional[Materials]:
         """Get material by ID."""
         pass

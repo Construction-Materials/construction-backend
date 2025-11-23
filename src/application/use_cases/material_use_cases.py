@@ -46,6 +46,34 @@ class MaterialUseCases:
             created_at=created_material.created_at
         )
     
+    async def create_materials_bulk(self, material_dtos: List[MaterialCreateDTO]) -> List[MaterialResponseDTO]:
+        """Create multiple materials at once."""
+        # Create domain entities
+        materials = [
+            Materials(
+                category_id=material_dto.category_id,
+                name=material_dto.name,
+                description=material_dto.description,
+                unit=material_dto.unit
+            )
+            for material_dto in material_dtos
+        ]
+        
+        # Save to repository
+        created_materials = await self._material_repository.create_bulk(materials)
+        
+        return [
+            MaterialResponseDTO(
+                material_id=material.id,
+                category_id=material.category_id,
+                name=material.name,
+                description=material.description,
+                unit=material.unit,
+                created_at=material.created_at
+            )
+            for material in created_materials
+        ]
+    
     async def get_material_by_id(self, material_id: UUID) -> MaterialResponseDTO:
         """Get material by ID."""
         material = await self._material_repository.get_by_id(material_id)

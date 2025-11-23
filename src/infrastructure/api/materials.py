@@ -39,6 +39,15 @@ async def create_material(
     return await material_use_cases.create_material(material_dto)
 
 
+@router.post("/bulk", response_model=List[MaterialResponseDTO], status_code=status.HTTP_201_CREATED)
+async def create_materials_bulk(
+    material_dtos: List[MaterialCreateDTO],
+    material_use_cases: MaterialUseCases = Depends(get_material_use_cases)
+):
+    """Create multiple materials at once."""
+    return await material_use_cases.create_materials_bulk(material_dtos)
+
+
 @router.get("/{material_id}", response_model=MaterialResponseDTO)
 async def get_material(
     material_id: UUID,

@@ -40,6 +40,33 @@ class MaterialRepositoryImpl(MaterialRepository):
             await self._session.rollback()
             raise DatabaseError(f"Failed to create material: {str(e)}") from e
     
+    async def create_bulk(self, materials: List[Materials]) -> List[Materials]:
+        """Create multiple materials at once."""
+        try:
+            material_models = [
+                MaterialModel(
+                    material_id=material.id,
+                    category_id=material.category_id,
+                    name=material.name,
+                    description=material.description,
+                    unit=material.unit,
+                    created_at=material.created_at
+                )
+                for material in materials
+            ]
+            
+            self._session.add_all(material_models)
+            await self._session.commit()
+            
+            # Refresh all models to get database-generated values
+            for material_model in material_models:
+                await self._session.refresh(material_model)
+            
+            return [self._to_domain(material_model) for material_model in material_models]
+        except Exception as e:
+            await self._session.rollback()
+            raise DatabaseError(f"Failed to create materials in bulk: {str(e)}") from e
+    
     async def get_by_id(self, material_id: UUID) -> Optional[Materials]:
         """Get material by ID."""
         try:
