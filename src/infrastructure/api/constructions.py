@@ -3,7 +3,7 @@ Construction API endpoints.
 """
 
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
 from uuid import UUID
 
 from src.application.dtos.construction_dto import (
@@ -14,7 +14,8 @@ from src.application.dtos.construction_dto import (
     ConstructionSearchDTO
 )
 from src.application.use_cases.construction_use_cases import ConstructionUseCases
-from src.infrastructure.api.dependencies import get_construction_use_cases
+from src.application.use_cases.document_analysis_use_cases import DocumentAnalysisUseCases
+from src.infrastructure.api.dependencies import get_construction_use_cases, get_document_analysis_use_cases
 
 router = APIRouter()
 
@@ -100,4 +101,38 @@ async def search_constructions(
     
     search_dto = ConstructionSearchDTO(query=query, page=page, size=size, status=status_enum)
     return await construction_use_cases.search_constructions(search_dto)
+
+
+@router.post("/{construction_id}/analyze-document", status_code=status.HTTP_200_OK)
+async def analyze_document(
+    construction_id: UUID,
+    file: UploadFile = File(..., description="Plik do analizy (zdjęcie lub PDF)"),
+    document_analysis_use_cases: DocumentAnalysisUseCases = Depends(get_document_analysis_use_cases),
+    construction_use_cases: ConstructionUseCases = Depends(get_construction_use_cases)
+):
+    """
+    Analizuj dokument (zdjęcie lub PDF) używając OpenAI API.
+    
+    Przyjmuje plik oraz construction_id i zwraca wyciągnięte dane w formacie JSON.
+    """
+    # Sprawdź czy construction istnieje
+    try:
+        await construction_use_cases.get_construction_by_id(construction_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Construction o ID {construction_id} nie został znaleziony"
+        )
+    
+    # Wczytaj zawartość pliku
+    file_content = await file.read()
+    
+    # Analizuj dokument
+    result = await document_analysis_use_cases.analyze_document(
+        file_content=file_content,
+        file_name=file.filename or "unknown",
+        construction_id=construction_id
+    )
+    
+    return result
 

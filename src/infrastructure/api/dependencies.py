@@ -19,6 +19,7 @@ from src.application.use_cases.material_use_cases import MaterialUseCases
 from src.application.use_cases.storage_use_cases import StorageUseCases
 from src.application.use_cases.storage_item_use_cases import StorageItemUseCases
 from src.application.use_cases.category_use_cases import CategoryUseCases
+from src.application.use_cases.document_analysis_use_cases import DocumentAnalysisUseCases
 
 from src.shared.exceptions import EntityNotFoundError
 
@@ -85,4 +86,9 @@ def get_storage_item_use_cases(
 ) -> StorageItemUseCases:
     """Get storage item use cases."""
     return StorageItemUseCases(storage_item_repo, storage_repo)
+
+
+def get_document_analysis_use_cases() -> DocumentAnalysisUseCases:
+    """Get document analysis use cases."""
+    return DocumentAnalysisUseCases()
 

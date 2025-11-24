@@ -32,12 +32,6 @@ for row in rows:
     print(dict(row))
 
 
-print("\n=== Przykładowe dane z categories ===")
-cursor.execute("SELECT * FROM categories LIMIT 5;")
-rows = cursor.fetchall()
-for row in rows:
-    print(dict(row))
-
 
 # Możesz teraz wykonywać własne zapytania:
 # cursor.execute("SELECT * FROM constructions WHERE name LIKE '%test%';")
