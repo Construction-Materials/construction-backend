@@ -8,7 +8,6 @@ from decimal import Decimal
 
 from src.domain.entities.storage_item import StorageItem
 from src.domain.repositories.storage_item_repository import StorageItemRepository
-from src.domain.repositories.storage_repository import StorageRepository
 from src.application.dtos.storage_item_dto import (
     StorageItemCreateDTO,
     StorageItemUpdateDTO,
@@ -23,15 +22,14 @@ from src.shared.exceptions import EntityNotFoundError, ValidationError
 class StorageItemUseCases:
     """StorageItem use cases implementation."""
     
-    def __init__(self, storage_item_repository: StorageItemRepository, storage_repository: StorageRepository = None):
+    def __init__(self, storage_item_repository: StorageItemRepository):
         self._storage_item_repository = storage_item_repository
-        self._storage_repository = storage_repository
     
     async def create_storage_item(self, storage_item_dto: StorageItemCreateDTO) -> StorageItemResponseDTO:
         """Create a new storage item."""
         # Create domain entity
         storage_item = StorageItem(
-            storage_id=storage_item_dto.storage_id,
+            construction_id=storage_item_dto.construction_id,
             material_id=storage_item_dto.material_id,
             quantity_value=storage_item_dto.quantity_value
         )
@@ -40,7 +38,7 @@ class StorageItemUseCases:
         created_storage_item = await self._storage_item_repository.create(storage_item)
         
         return StorageItemResponseDTO(
-            storage_id=created_storage_item.storage_id,
+            construction_id=created_storage_item.construction_id,
             material_id=created_storage_item.material_id,
             quantity_value=created_storage_item.quantity_value,
             created_at=created_storage_item.created_at
@@ -48,19 +46,19 @@ class StorageItemUseCases:
     
     async def get_storage_item_by_ids(
         self, 
-        storage_id: UUID, 
+        construction_id: UUID, 
         material_id: UUID
     ) -> StorageItemResponseDTO:
-        """Get storage item by storage ID and material ID."""
-        storage_item = await self._storage_item_repository.get_by_ids(storage_id, material_id)
+        """Get storage item by construction ID and material ID."""
+        storage_item = await self._storage_item_repository.get_by_ids(construction_id, material_id)
         if not storage_item:
             raise EntityNotFoundError(
                 "StorageItem", 
-                f"storage_id={storage_id}, material_id={material_id}"
+                f"construction_id={construction_id}, material_id={material_id}"
             )
         
         return StorageItemResponseDTO(
-            storage_id=storage_item.storage_id,
+            construction_id=storage_item.construction_id,
             material_id=storage_item.material_id,
             quantity_value=storage_item.quantity_value,
             created_at=storage_item.created_at
@@ -68,16 +66,16 @@ class StorageItemUseCases:
     
     async def update_storage_item(
         self, 
-        storage_id: UUID, 
+        construction_id: UUID, 
         material_id: UUID, 
         storage_item_dto: StorageItemUpdateDTO
     ) -> StorageItemResponseDTO:
         """Update storage item."""
-        storage_item = await self._storage_item_repository.get_by_ids(storage_id, material_id)
+        storage_item = await self._storage_item_repository.get_by_ids(construction_id, material_id)
         if not storage_item:
             raise EntityNotFoundError(
                 "StorageItem", 
-                f"storage_id={storage_id}, material_id={material_id}"
+                f"construction_id={construction_id}, material_id={material_id}"
             )
         
         # Update fields if provided
@@ -88,32 +86,32 @@ class StorageItemUseCases:
         updated_storage_item = await self._storage_item_repository.update(storage_item)
         
         return StorageItemResponseDTO(
-            storage_id=updated_storage_item.storage_id,
+            construction_id=updated_storage_item.construction_id,
             material_id=updated_storage_item.material_id,
             quantity_value=updated_storage_item.quantity_value,
             created_at=updated_storage_item.created_at
         )
     
-    async def delete_storage_item(self, storage_id: UUID, material_id: UUID) -> bool:
+    async def delete_storage_item(self, construction_id: UUID, material_id: UUID) -> bool:
         """Delete storage item."""
-        storage_item = await self._storage_item_repository.get_by_ids(storage_id, material_id)
+        storage_item = await self._storage_item_repository.get_by_ids(construction_id, material_id)
         if not storage_item:
             raise EntityNotFoundError(
                 "StorageItem", 
-                f"storage_id={storage_id}, material_id={material_id}"
+                f"construction_id={construction_id}, material_id={material_id}"
             )
         
-        return await self._storage_item_repository.delete(storage_id, material_id)
+        return await self._storage_item_repository.delete(construction_id, material_id)
     
-    async def get_storage_items_by_storage_id(
+    async def get_storage_items_by_construction_id(
         self, 
-        storage_id: UUID, 
+        construction_id: UUID, 
         limit: int = 100, 
         offset: int = 0
     ) -> StorageItemListResponseDTO:
-        """Get storage items by storage ID."""
-        storage_items = await self._storage_item_repository.get_by_storage_id(
-            storage_id=storage_id,
+        """Get storage items by construction ID."""
+        storage_items = await self._storage_item_repository.get_by_construction_id(
+            construction_id=construction_id,
             limit=limit,
             offset=offset
         )
@@ -121,7 +119,7 @@ class StorageItemUseCases:
         return StorageItemListResponseDTO(
             storage_items=[
                 StorageItemResponseDTO(
-                    storage_id=storage_item.storage_id,
+                    construction_id=storage_item.construction_id,
                     material_id=storage_item.material_id,
                     quantity_value=storage_item.quantity_value,
                     created_at=storage_item.created_at
@@ -149,7 +147,7 @@ class StorageItemUseCases:
         return StorageItemListResponseDTO(
             storage_items=[
                 StorageItemResponseDTO(
-                    storage_id=storage_item.storage_id,
+                    construction_id=storage_item.construction_id,
                     material_id=storage_item.material_id,
                     quantity_value=storage_item.quantity_value,
                     created_at=storage_item.created_at
@@ -161,17 +159,17 @@ class StorageItemUseCases:
             size=limit
         )
     
-    async def get_materials_by_storage_id(
+    async def get_materials_by_construction_id(
         self, 
-        storage_id: UUID
+        construction_id: UUID
     ) -> StorageItemMaterialListResponseDTO:
-        """Get materials with details by storage ID."""
-        materials_data = await self._storage_item_repository.get_materials_by_storage_id(storage_id)
+        """Get materials with details by construction ID."""
+        materials_data = await self._storage_item_repository.get_materials_by_construction_id(construction_id)
         
         return StorageItemMaterialListResponseDTO(
             materials=[
                 StorageItemMaterialDTO(
-                    storage_id=material['storage_id'],
+                    construction_id=material['construction_id'],
                     material_id=material['material_id'],
                     name=material['name'],
                     category=material['category'],
@@ -191,31 +189,22 @@ class StorageItemUseCases:
     ) -> List[StorageItemResponseDTO]:
         """Create multiple storage items at once for a given construction.
         
-        Validates that all storage_ids belong to the given construction_id.
+        Validates that all construction_ids in the request match the given construction_id.
         """
-        if not self._storage_repository:
-            raise ValidationError("Storage repository is required for bulk operations")
-        
         if not storage_item_dtos:
             raise ValidationError("At least one storage item is required")
         
-        # Get unique storage IDs from the request
-        storage_ids = list(set(dto.storage_id for dto in storage_item_dtos))
-        
-        # Validate that all storages belong to the given construction
-        for storage_id in storage_ids:
-            storage = await self._storage_repository.get_by_id(storage_id)
-            if not storage:
-                raise EntityNotFoundError("Storage", str(storage_id))
-            if storage.construction_id != construction_id:
+        # Validate that all construction_ids match
+        for dto in storage_item_dtos:
+            if dto.construction_id != construction_id:
                 raise ValidationError(
-                    f"Storage {storage_id} does not belong to construction {construction_id}"
+                    f"Storage item construction_id {dto.construction_id} does not match {construction_id}"
                 )
         
         # Create domain entities
         storage_items = [
             StorageItem(
-                storage_id=storage_item_dto.storage_id,
+                construction_id=storage_item_dto.construction_id,
                 material_id=storage_item_dto.material_id,
                 quantity_value=storage_item_dto.quantity_value
             )
@@ -227,7 +216,7 @@ class StorageItemUseCases:
         
         return [
             StorageItemResponseDTO(
-                storage_id=storage_item.storage_id,
+                construction_id=storage_item.construction_id,
                 material_id=storage_item.material_id,
                 quantity_value=storage_item.quantity_value,
                 created_at=storage_item.created_at

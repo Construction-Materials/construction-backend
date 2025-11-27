@@ -37,7 +37,7 @@ class ConstructionModel(Base):
     created_at = Column(DateTime, default=func.now(), nullable=False)
     
     # Relationships
-    storages = relationship("StorageModel", back_populates="construction", cascade="all, delete-orphan")
+    storage_items = relationship("StorageItemModel", back_populates="construction", cascade="all, delete-orphan")
 
 class MaterialModel(Base):
     """Material SQLAlchemy model."""
@@ -56,30 +56,16 @@ class MaterialModel(Base):
     category = relationship("CategoryModel", back_populates="materials")
     storage_items = relationship("StorageItemModel", back_populates="material")
 
-class StorageModel(Base):
-    """Storage SQLAlchemy model."""
-    
-    __tablename__ = "storages"
-    
-    storage_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    construction_id = Column(UUID(as_uuid=True), ForeignKey("constructions.construction_id"), nullable=False, index=True)
-    name = Column(String(100), nullable=False, index=True)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
-
-    # Relationships
-    construction = relationship("ConstructionModel", back_populates="storages")
-    storage_items = relationship("StorageItemModel", back_populates="storage", cascade="all, delete-orphan")
-
 class StorageItemModel(Base):
     """Storage item SQLAlchemy model."""
     
     __tablename__ = "storage_items"
     
-    storage_id = Column(UUID(as_uuid=True), ForeignKey("storages.storage_id"), primary_key=True, nullable=False)
+    construction_id = Column(UUID(as_uuid=True), ForeignKey("constructions.construction_id"), primary_key=True, nullable=False, index=True)
     material_id = Column(UUID(as_uuid=True), ForeignKey("materials.material_id"), primary_key=True, nullable=False)
     quantity_value = Column(DECIMAL(8, 2), nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
 
     # Relationships
-    storage = relationship("StorageModel", back_populates="storage_items")
+    construction = relationship("ConstructionModel", back_populates="storage_items")
     material = relationship("MaterialModel", back_populates="storage_items")

@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 class StorageItemCreateDTO(BaseModel):
     """DTO for creating a new storage item."""
-    storage_id: UUID = Field(..., description="Storage ID")
+    construction_id: UUID = Field(..., description="Construction ID")
     material_id: UUID = Field(..., description="Material ID")
     quantity_value: Decimal = Field(..., ge=0, description="Quantity value")
 
@@ -23,7 +23,7 @@ class StorageItemUpdateDTO(BaseModel):
 
 class StorageItemResponseDTO(BaseModel):
     """DTO for storage item response."""
-    storage_id: UUID = Field(..., description="Storage ID")
+    construction_id: UUID = Field(..., description="Construction ID")
     material_id: UUID = Field(..., description="Material ID")
     quantity_value: Decimal = Field(..., description="Quantity value")
     created_at: datetime = Field(..., description="Creation timestamp")
@@ -43,7 +43,7 @@ class StorageItemListResponseDTO(BaseModel):
 
 class StorageItemMaterialDTO(BaseModel):
     """DTO for storage item with material details."""
-    storage_id: UUID = Field(..., description="Storage ID")
+    construction_id: UUID = Field(..., description="Construction ID")
     material_id: UUID = Field(..., description="Material ID")
     name: str = Field(..., description="Material name")
     category: str = Field(..., description="Category name")

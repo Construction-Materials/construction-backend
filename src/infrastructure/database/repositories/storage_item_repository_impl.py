@@ -23,7 +23,7 @@ class StorageItemRepositoryImpl(StorageItemRepository):
         """Create a new storage item."""
         try:
             storage_item_model = StorageItemModel(
-                storage_id=storage_item.storage_id,
+                construction_id=storage_item.construction_id,
                 material_id=storage_item.material_id,
                 quantity_value=storage_item.quantity_value,
                 created_at=storage_item.created_at
@@ -43,7 +43,7 @@ class StorageItemRepositoryImpl(StorageItemRepository):
         try:
             storage_item_models = [
                 StorageItemModel(
-                    storage_id=storage_item.storage_id,
+                    construction_id=storage_item.construction_id,
                     material_id=storage_item.material_id,
                     quantity_value=storage_item.quantity_value,
                     created_at=storage_item.created_at
@@ -63,13 +63,13 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             await self._session.rollback()
             raise DatabaseError(f"Failed to create storage items in bulk: {str(e)}") from e
     
-    async def get_by_ids(self, storage_id: UUID, material_id: UUID) -> Optional[StorageItem]:
-        """Get storage item by storage ID and material ID."""
+    async def get_by_ids(self, construction_id: UUID, material_id: UUID) -> Optional[StorageItem]:
+        """Get storage item by construction ID and material ID."""
         try:
             result = await self._session.execute(
                 select(StorageItemModel).where(
                     and_(
-                        StorageItemModel.storage_id == storage_id,
+                        StorageItemModel.construction_id == construction_id,
                         StorageItemModel.material_id == material_id
                     )
                 )
@@ -86,7 +86,7 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             result = await self._session.execute(
                 select(StorageItemModel).where(
                     and_(
-                        StorageItemModel.storage_id == storage_item.storage_id,
+                        StorageItemModel.construction_id == storage_item.construction_id,
                         StorageItemModel.material_id == storage_item.material_id
                     )
                 )
@@ -95,7 +95,7 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             
             if not storage_item_model:
                 raise DatabaseError(
-                    f"Storage item with storage_id {storage_item.storage_id} "
+                    f"Storage item with construction_id {storage_item.construction_id} "
                     f"and material_id {storage_item.material_id} not found"
                 )
             
@@ -109,13 +109,13 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             await self._session.rollback()
             raise DatabaseError(f"Failed to update storage item: {str(e)}") from e
     
-    async def delete(self, storage_id: UUID, material_id: UUID) -> bool:
-        """Delete storage item by storage ID and material ID."""
+    async def delete(self, construction_id: UUID, material_id: UUID) -> bool:
+        """Delete storage item by construction ID and material ID."""
         try:
             result = await self._session.execute(
                 delete(StorageItemModel).where(
                     and_(
-                        StorageItemModel.storage_id == storage_id,
+                        StorageItemModel.construction_id == construction_id,
                         StorageItemModel.material_id == material_id
                     )
                 )
@@ -127,12 +127,12 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             await self._session.rollback()
             raise DatabaseError(f"Failed to delete storage item: {str(e)}") from e
     
-    async def get_by_storage_id(self, storage_id: UUID, limit: int = 100, offset: int = 0) -> List[StorageItem]:
-        """Get storage items by storage ID."""
+    async def get_by_construction_id(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> List[StorageItem]:
+        """Get storage items by construction ID."""
         try:
             result = await self._session.execute(
                 select(StorageItemModel)
-                .where(StorageItemModel.storage_id == storage_id)
+                .where(StorageItemModel.construction_id == construction_id)
                 .offset(offset)
                 .limit(limit)
                 .order_by(StorageItemModel.created_at.desc())
@@ -141,7 +141,7 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             
             return [self._to_domain(storage_item_model) for storage_item_model in storage_item_models]
         except Exception as e:
-            raise DatabaseError(f"Failed to get storage items by storage ID: {str(e)}") from e
+            raise DatabaseError(f"Failed to get storage items by construction ID: {str(e)}") from e
     
     async def get_by_material_id(self, material_id: UUID, limit: int = 100, offset: int = 0) -> List[StorageItem]:
         """Get storage items by material ID."""
@@ -169,12 +169,12 @@ class StorageItemRepositoryImpl(StorageItemRepository):
         except Exception as e:
             raise DatabaseError(f"Failed to count storage items: {str(e)}") from e
     
-    async def get_materials_by_storage_id(self, storage_id: UUID) -> List[dict]:
-        """Get materials with details by storage ID."""
+    async def get_materials_by_construction_id(self, construction_id: UUID) -> List[dict]:
+        """Get materials with details by construction ID."""
         try:
             result = await self._session.execute(
                 select(
-                    StorageItemModel.storage_id,
+                    StorageItemModel.construction_id,
                     StorageItemModel.material_id,
                     MaterialModel.name,
                     CategoryModel.name.label('category_name'),
@@ -185,14 +185,14 @@ class StorageItemRepositoryImpl(StorageItemRepository):
                 )
                 .join(StorageItemModel, MaterialModel.material_id == StorageItemModel.material_id)
                 .join(CategoryModel, MaterialModel.category_id == CategoryModel.category_id)
-                .where(StorageItemModel.storage_id == storage_id)
+                .where(StorageItemModel.construction_id == construction_id)
                 .order_by(MaterialModel.name)
             )
             rows = result.all()
             
             return [
                 {
-                    'storage_id': row.storage_id,
+                    'construction_id': row.construction_id,
                     'material_id': row.material_id,
                     'name': row.name,
                     'category': row.category_name,
@@ -204,12 +204,12 @@ class StorageItemRepositoryImpl(StorageItemRepository):
                 for row in rows
             ]
         except Exception as e:
-            raise DatabaseError(f"Failed to get materials by storage ID: {str(e)}") from e
+            raise DatabaseError(f"Failed to get materials by construction ID: {str(e)}") from e
     
     def _to_domain(self, storage_item_model: StorageItemModel) -> StorageItem:
         """Convert SQLAlchemy model to domain entity."""
         return StorageItem(
-            storage_id=storage_item_model.storage_id,
+            construction_id=storage_item_model.construction_id,
             material_id=storage_item_model.material_id,
             quantity_value=storage_item_model.quantity_value,
             created_at=storage_item_model.created_at

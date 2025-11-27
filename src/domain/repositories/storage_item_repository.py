@@ -23,8 +23,8 @@ class StorageItemRepository(ABC):
         pass
     
     @abstractmethod
-    async def get_by_ids(self, storage_id: UUID, material_id: UUID) -> Optional[StorageItem]:
-        """Get storage item by storage ID and material ID."""
+    async def get_by_ids(self, construction_id: UUID, material_id: UUID) -> Optional[StorageItem]:
+        """Get storage item by construction ID and material ID."""
         pass
     
     @abstractmethod
@@ -33,13 +33,13 @@ class StorageItemRepository(ABC):
         pass
     
     @abstractmethod
-    async def delete(self, storage_id: UUID, material_id: UUID) -> bool:
-        """Delete storage item by storage ID and material ID."""
+    async def delete(self, construction_id: UUID, material_id: UUID) -> bool:
+        """Delete storage item by construction ID and material ID."""
         pass
     
     @abstractmethod
-    async def get_by_storage_id(self, storage_id: UUID, limit: int = 100, offset: int = 0) -> List[StorageItem]:
-        """Get storage items by storage ID."""
+    async def get_by_construction_id(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> List[StorageItem]:
+        """Get storage items by construction ID."""
         pass
     
     @abstractmethod
@@ -53,7 +53,7 @@ class StorageItemRepository(ABC):
         pass
     
     @abstractmethod
-    async def get_materials_by_storage_id(self, storage_id: UUID) -> List[dict]:
-        """Get materials with details by storage ID."""
+    async def get_materials_by_construction_id(self, construction_id: UUID) -> List[dict]:
+        """Get materials with details by construction ID."""
         pass
 
