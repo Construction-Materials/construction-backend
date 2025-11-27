@@ -12,4 +12,5 @@ class ConstructionStatus(str, Enum):
     INACTIVE = "inactive"
     ARCHIVED = "archived"
     DELETED = "deleted"
+    COMPLETED = "completed"
 

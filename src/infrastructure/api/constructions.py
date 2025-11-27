@@ -249,9 +249,20 @@ async def create_construction(
         return created_construction
     else:
         # Obsługa JSON (standardowy ConstructionCreateDTO)
-        body = await request.json()
-        construction_dto = ConstructionCreateDTO(**body)
-        return await construction_use_cases.create_construction(construction_dto)
+        try:
+            body = await request.json()
+            construction_dto = ConstructionCreateDTO(**body)
+            return await construction_use_cases.create_construction(construction_dto)
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"{str(e)}"
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"{str(e)}"
+            )
 
 
 @router.get("/{construction_id}", response_model=ConstructionResponseDTO)

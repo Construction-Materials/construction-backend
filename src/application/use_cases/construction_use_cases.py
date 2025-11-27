@@ -28,12 +28,13 @@ class ConstructionUseCases:
         """Create a new construction."""
         # Create domain entity
         from src.domain.value_objects.construction_status import ConstructionStatus as DomainStatus
+        # construction_dto.status is already ConstructionStatus enum from domain
         construction = Construction(
             name=construction_dto.name,
             description=construction_dto.description,
             address=construction_dto.address,
             start_date=construction_dto.start_date,
-            status=DomainStatus(construction_dto.status.value),
+            status=DomainStatus(construction_dto.status.value) if isinstance(construction_dto.status, str) else construction_dto.status,
             img_url=construction_dto.img_url
         )
         
