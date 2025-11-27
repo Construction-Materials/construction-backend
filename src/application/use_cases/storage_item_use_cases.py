@@ -26,7 +26,11 @@ class StorageItemUseCases:
         self._storage_item_repository = storage_item_repository
     
     async def create_storage_item(self, storage_item_dto: StorageItemCreateDTO) -> StorageItemResponseDTO:
-        """Create a new storage item."""
+        """Create a new storage item or update existing one by adding quantity.
+        
+        If storage item with given construction_id and material_id already exists,
+        adds the new quantity_value to the existing one.
+        """
         # Create domain entity
         storage_item = StorageItem(
             construction_id=storage_item_dto.construction_id,
@@ -34,14 +38,14 @@ class StorageItemUseCases:
             quantity_value=storage_item_dto.quantity_value
         )
         
-        # Save to repository
-        created_storage_item = await self._storage_item_repository.create(storage_item)
+        # Upsert to repository (create or update by adding quantity)
+        upserted_storage_item = await self._storage_item_repository.upsert(storage_item)
         
         return StorageItemResponseDTO(
-            construction_id=created_storage_item.construction_id,
-            material_id=created_storage_item.material_id,
-            quantity_value=created_storage_item.quantity_value,
-            created_at=created_storage_item.created_at
+            construction_id=upserted_storage_item.construction_id,
+            material_id=upserted_storage_item.material_id,
+            quantity_value=upserted_storage_item.quantity_value,
+            created_at=upserted_storage_item.created_at
         )
     
     async def get_storage_item_by_ids(
@@ -187,9 +191,11 @@ class StorageItemUseCases:
         construction_id: UUID, 
         storage_item_dtos: List[StorageItemCreateDTO]
     ) -> List[StorageItemResponseDTO]:
-        """Create multiple storage items at once for a given construction.
+        """Create or update multiple storage items at once for a given construction.
         
         Validates that all construction_ids in the request match the given construction_id.
+        If storage item with given construction_id and material_id already exists,
+        adds the new quantity_value to the existing one.
         """
         if not storage_item_dtos:
             raise ValidationError("At least one storage item is required")
@@ -211,8 +217,8 @@ class StorageItemUseCases:
             for storage_item_dto in storage_item_dtos
         ]
         
-        # Save to repository
-        created_storage_items = await self._storage_item_repository.create_bulk(storage_items)
+        # Upsert to repository (create or update by adding quantity)
+        upserted_storage_items = await self._storage_item_repository.upsert_bulk(storage_items)
         
         return [
             StorageItemResponseDTO(
@@ -221,6 +227,6 @@ class StorageItemUseCases:
                 quantity_value=storage_item.quantity_value,
                 created_at=storage_item.created_at
             )
-            for storage_item in created_storage_items
+            for storage_item in upserted_storage_items
         ]
 

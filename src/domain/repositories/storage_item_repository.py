@@ -56,4 +56,14 @@ class StorageItemRepository(ABC):
     async def get_materials_by_construction_id(self, construction_id: UUID) -> List[dict]:
         """Get materials with details by construction ID."""
         pass
+    
+    @abstractmethod
+    async def upsert(self, storage_item: StorageItem) -> StorageItem:
+        """Create or update storage item. If exists, adds quantity_value to existing."""
+        pass
+    
+    @abstractmethod
+    async def upsert_bulk(self, storage_items: List[StorageItem]) -> List[StorageItem]:
+        """Create or update multiple storage items. If exists, adds quantity_value to existing."""
+        pass
 

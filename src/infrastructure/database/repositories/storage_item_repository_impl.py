@@ -4,6 +4,7 @@ StorageItem Repository Implementation (Adapter).
 
 from typing import List, Optional
 from uuid import UUID
+from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func, and_
 
@@ -205,6 +206,45 @@ class StorageItemRepositoryImpl(StorageItemRepository):
             ]
         except Exception as e:
             raise DatabaseError(f"Failed to get materials by construction ID: {str(e)}") from e
+    
+    async def upsert(self, storage_item: StorageItem) -> StorageItem:
+        """Create or update storage item. If exists, adds quantity_value to existing."""
+        try:
+            existing = await self.get_by_ids(storage_item.construction_id, storage_item.material_id)
+            
+            if existing:
+                # Update: add new quantity to existing
+                new_quantity = existing.quantity_value + storage_item.quantity_value
+                existing.set_quantity_value(new_quantity)
+                return await self.update(existing)
+            else:
+                # Create new
+                return await self.create(storage_item)
+        except Exception as e:
+            raise DatabaseError(f"Failed to upsert storage item: {str(e)}") from e
+    
+    async def upsert_bulk(self, storage_items: List[StorageItem]) -> List[StorageItem]:
+        """Create or update multiple storage items. If exists, adds quantity_value to existing."""
+        try:
+            result_items = []
+            
+            for storage_item in storage_items:
+                existing = await self.get_by_ids(storage_item.construction_id, storage_item.material_id)
+                
+                if existing:
+                    # Update: add new quantity to existing
+                    new_quantity = existing.quantity_value + storage_item.quantity_value
+                    existing.set_quantity_value(new_quantity)
+                    updated = await self.update(existing)
+                    result_items.append(updated)
+                else:
+                    # Create new
+                    created = await self.create(storage_item)
+                    result_items.append(created)
+            
+            return result_items
+        except Exception as e:
+            raise DatabaseError(f"Failed to upsert storage items in bulk: {str(e)}") from e
     
     def _to_domain(self, storage_item_model: StorageItemModel) -> StorageItem:
         """Convert SQLAlchemy model to domain entity."""
