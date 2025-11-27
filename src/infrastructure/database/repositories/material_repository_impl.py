@@ -10,7 +10,7 @@ from rapidfuzz import fuzz
 
 from src.domain.entities.materials import Materials
 from src.domain.repositories.material_repository import MaterialRepository
-from src.infrastructure.database.models import MaterialModel, StorageItemModel, StorageModel
+from src.infrastructure.database.models import MaterialModel, StorageItemModel
 from src.shared.exceptions import DatabaseError
 
 
@@ -217,13 +217,12 @@ class MaterialRepositoryImpl(MaterialRepository):
             raise DatabaseError(f"Failed to count materials: {str(e)}") from e
     
     async def get_by_construction_id(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> List[Materials]:
-        """Get materials by construction ID (through storages)."""
+        """Get materials by construction ID."""
         try:
             result = await self._session.execute(
                 select(MaterialModel)
                 .join(StorageItemModel, MaterialModel.material_id == StorageItemModel.material_id)
-                .join(StorageModel, StorageItemModel.storage_id == StorageModel.storage_id)
-                .where(StorageModel.construction_id == construction_id)
+                .where(StorageItemModel.construction_id == construction_id)
                 .distinct()
                 .offset(offset)
                 .limit(limit)
