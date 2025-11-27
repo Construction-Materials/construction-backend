@@ -5,6 +5,7 @@ Construction API endpoints.
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
 from uuid import UUID
+from rapidfuzz import fuzz
 
 from src.application.dtos.construction_dto import (
     ConstructionCreateDTO,
@@ -13,9 +14,11 @@ from src.application.dtos.construction_dto import (
     ConstructionListResponseDTO,
     ConstructionSearchDTO
 )
+from src.application.dtos.material_dto import MaterialSearchDTO
 from src.application.use_cases.construction_use_cases import ConstructionUseCases
 from src.application.use_cases.document_analysis_use_cases import DocumentAnalysisUseCases
-from src.infrastructure.api.dependencies import get_construction_use_cases, get_document_analysis_use_cases
+from src.application.use_cases.material_use_cases import MaterialUseCases
+from src.infrastructure.api.dependencies import get_construction_use_cases, get_document_analysis_use_cases, get_material_use_cases
 
 router = APIRouter()
 
@@ -108,12 +111,15 @@ async def analyze_document(
     construction_id: UUID,
     file: UploadFile = File(..., description="Plik do analizy (zdjęcie lub PDF)"),
     document_analysis_use_cases: DocumentAnalysisUseCases = Depends(get_document_analysis_use_cases),
-    construction_use_cases: ConstructionUseCases = Depends(get_construction_use_cases)
+    construction_use_cases: ConstructionUseCases = Depends(get_construction_use_cases),
+    material_use_cases: MaterialUseCases = Depends(get_material_use_cases)
 ):
     """
     Analizuj dokument (zdjęcie lub PDF) używając OpenAI API.
     
     Przyjmuje plik oraz construction_id i zwraca wyciągnięte dane w formacie JSON.
+    Dla każdego materiału sprawdza czy istnieje w bazie i czy jednostka się zgadza.
+    Jeśli jednostka się nie zgadza, użytkownik będzie musiał ręcznie wpisać ilość.
     """
     # Sprawdź czy construction istnieje
     try:
@@ -133,6 +139,100 @@ async def analyze_document(
         file_name=file.filename or "unknown",
         construction_id=construction_id
     )
+    
+    # Sprawdź materiały w bazie i zgodność jednostek
+    if "extracted_data" in result and "materials" in result["extracted_data"]:
+        materials = result["extracted_data"]["materials"]
+        enriched_materials = []
+        
+        for material in materials:
+            material_name = material.get("name", "")
+            document_unit = material.get("unit", "")
+            quantity = material.get("quantity", 0)
+            
+            # Szukaj materiału w bazie po nazwie
+            try:
+                # Najpierw sprawdź czy jest idealny match (dokładna nazwa)
+                all_materials = await material_use_cases.list_all_materials(limit=1000, offset=0)
+                matching_material = None
+                
+                for db_material in all_materials.materials:
+                    if db_material.name.lower() == material_name.lower():
+                        matching_material = db_material
+                        break
+                
+                if matching_material:
+                    # Materiał istnieje w bazie - idealny match
+                    # Unit może być UnitEnum lub string
+                    material_unit = matching_material.unit.value if hasattr(matching_material.unit, 'value') else str(matching_material.unit)
+                    unit_matches = (material_unit == document_unit)
+                    
+                    enriched_material = {
+                        **material,
+                        "material_id": str(matching_material.material_id),
+                        "material_exists": True,
+                        "material_unit": material_unit,
+                        "unit_matches": unit_matches,
+                        "can_use_quantity": unit_matches,  # Jeśli unit się zgadza, można użyć quantity
+                        "suggested_materials": []  # Brak sugestii, bo jest idealny match
+                    }
+                else:
+                    # Materiał nie istnieje w bazie - szukaj podobnych
+                    search_dto = MaterialSearchDTO(query=material_name, page=1, size=5)
+                    similar_materials_result = await material_use_cases.search_materials(search_dto)
+                    
+                    # Przygotuj listę sugerowanych materiałów z filtrowaniem po score
+                    suggested_materials = []
+                    material_name_lower = material_name.lower()
+                    
+                    for suggested in similar_materials_result.materials[:5]:  # Top 5
+                        suggested_name_lower = suggested.name.lower()
+                        
+                        # Oblicz score podobieństwa używając różnych metod fuzzy matching
+                        ratio_score = fuzz.ratio(material_name_lower, suggested_name_lower)
+                        partial_score = fuzz.partial_ratio(material_name_lower, suggested_name_lower)
+                        token_sort_score = fuzz.token_sort_ratio(material_name_lower, suggested_name_lower)
+                        token_set_score = fuzz.token_set_ratio(material_name_lower, suggested_name_lower)
+                        
+                        # Użyj najwyższego wyniku
+                        max_score = max(ratio_score, partial_score, token_sort_score, token_set_score)
+                        
+                        # Filtruj tylko materiały z score >= 50 (0.5 = 50%)
+                        if max_score >= 50:
+                            suggested_unit = suggested.unit.value if hasattr(suggested.unit, 'value') else str(suggested.unit)
+                            suggested_materials.append({
+                                "material_id": str(suggested.material_id),
+                                "name": suggested.name,
+                                "unit": suggested_unit,
+                                "description": suggested.description,
+                                "similarity_score": max_score  # Dodaj score dla informacji
+                            })
+                    
+                    enriched_material = {
+                        **material,
+                        "material_id": None,
+                        "material_exists": False,
+                        "material_unit": None,
+                        "unit_matches": False,
+                        "can_use_quantity": False,  # Nie można użyć, bo materiał nie istnieje
+                        "suggested_materials": suggested_materials  # Tylko materiały z score >= 50%
+                    }
+                
+                enriched_materials.append(enriched_material)
+                
+            except Exception as e:
+                # W przypadku błędu, zwróć materiał bez dodatkowych informacji
+                enriched_materials.append({
+                    **material,
+                    "material_id": None,
+                    "material_exists": False,
+                    "material_unit": None,
+                    "unit_matches": False,
+                    "can_use_quantity": False,
+                    "error": f"Błąd podczas sprawdzania materiału: {str(e)}"
+                })
+        
+        result["extracted_data"]["materials"] = enriched_materials
     
     return result
 

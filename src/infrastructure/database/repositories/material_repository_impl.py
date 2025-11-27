@@ -2,10 +2,11 @@
 Material Repository Implementation (Adapter).
 """
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func
+from rapidfuzz import fuzz
 
 from src.domain.entities.materials import Materials
 from src.domain.repositories.material_repository import MaterialRepository
@@ -148,18 +149,60 @@ class MaterialRepositoryImpl(MaterialRepository):
             raise DatabaseError(f"Failed to get materials by category ID: {str(e)}") from e
     
     async def search_by_name(self, name: str, limit: int = 100, offset: int = 0) -> List[Materials]:
-        """Search materials by name."""
+        """Search materials by name using fuzzy matching and sort by relevance."""
         try:
+            # Pobierz wszystkie materiały (lub większy zbiór) do analizy fuzzy matching
+            # Nie używamy ILIKE jako wstępnego filtru, bo może pominąć dobre dopasowania
+            # (np. "Pomadka długotrwała" nie znajdzie "Pomadka" przez ILIKE)
             result = await self._session.execute(
                 select(MaterialModel)
-                .where(MaterialModel.name.ilike(f"%{name}%"))
-                .offset(offset)
-                .limit(limit)
-                .order_by(MaterialModel.created_at.desc())
+                .limit(500)  # Pobierz więcej materiałów do analizy fuzzy
             )
             material_models = result.scalars().all()
             
-            return [self._to_domain(material_model) for material_model in material_models]
+            if not material_models:
+                return []
+            
+            # Oblicz podobieństwo dla każdego materiału używając fuzzy matching
+            materials_with_scores: List[Tuple[Materials, float]] = []
+            search_name_lower = name.lower()
+            
+            for material_model in material_models:
+                material = self._to_domain(material_model)
+                material_name_lower = material.name.lower()
+                
+                # Oblicz podobieństwo używając różnych metod fuzzy matching
+                # ratio() - porównuje całe stringi
+                ratio_score = fuzz.ratio(search_name_lower, material_name_lower)
+                
+                # partial_ratio() - najlepsze dopasowanie częściowe (lepsze dla dłuższych nazw)
+                # Np. "Pomadka długotrwała 03" vs "Pomadka" - znajdzie "Pomadka"
+                partial_score = fuzz.partial_ratio(search_name_lower, material_name_lower)
+                
+                # token_sort_ratio() - ignoruje kolejność słów
+                token_sort_score = fuzz.token_sort_ratio(search_name_lower, material_name_lower)
+                
+                # token_set_ratio() - najlepsze dla różnej długości stringów
+                token_set_score = fuzz.token_set_ratio(search_name_lower, material_name_lower)
+                
+                # Użyj najwyższego wyniku z wszystkich metod
+                max_score = max(ratio_score, partial_score, token_sort_score, token_set_score)
+                
+                # Filtruj tylko materiały z score >= 30% (aby pominąć całkowicie niepasujące)
+                if max_score >= 30:
+                    materials_with_scores.append((material, max_score))
+            
+            # Sortuj po trafności (similarity score) - najwyższe najpierw
+            materials_with_scores.sort(key=lambda x: x[1], reverse=True)
+            
+            # Zastosuj offset i limit
+            start_idx = offset
+            end_idx = offset + limit
+            
+            # Zwróć tylko materiały (bez score)
+            sorted_materials = [material for material, _ in materials_with_scores[start_idx:end_idx]]
+            
+            return sorted_materials
         except Exception as e:
             raise DatabaseError(f"Failed to search materials by name: {str(e)}") from e
     

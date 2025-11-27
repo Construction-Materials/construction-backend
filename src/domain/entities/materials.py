@@ -63,26 +63,21 @@ class Materials:
         """Get creation timestamp."""
         return self._created_at
     
-    @property
     def set_name(self, name: str) -> None:
         """Set material name with validation."""
         if not name or not name.strip():
             raise ValidationError("Material name cannot be empty")
         self._name = name.strip()
     
-    @property
     def set_description(self, description: str) -> None:
         """Set material description with validation."""
-        if not description or not description.strip():
-            raise ValidationError("Material description cannot be empty")
-        self._description = description.strip()
+        # Pozwól na pusty string dla description
+        self._description = description.strip() if description else ""
     
-    @property
     def set_unit(self, unit: UnitEnum) -> None:
         """Set material unit."""
         self._unit = unit
     
-    @property
     def set_category_id(self, category_id: UUID) -> None:
         """Set category ID."""
         self._category_id = category_id

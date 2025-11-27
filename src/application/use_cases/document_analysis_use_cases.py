@@ -70,11 +70,65 @@ class DocumentAnalysisUseCases:
         mime_type = mime_type_map.get(file_extension, 'image/jpeg')
         
         # Prepare prompt for OpenAI
-        prompt = """Przeanalizuj ten dokument/zdjęcie i wyciągnij wszystkie dostępne dane. 
-Zwróć dane w formacie JSON. Jeśli dokument zawiera informacje o materiałach, 
-zamówieniach, kosztach, datach, lub innych danych związanych z budową, 
-uwzględnij je w odpowiedzi. Jeśli nie możesz wyciągnąć konkretnych danych, 
-zwróć opis tego, co widzisz w dokumencie.
+        prompt = """Przeanalizuj ten dokument/zdjęcie i wyciągnij WSZYSTKIE materiały (produkty, towary, składniki) z ich ilościami.
+
+Materiałem może być: cement, cegły, drewno, stal, farba, gips, piasek, żwir, kafelki, rury, kable, druty, śruby, gwoździe, izolacja, płyty, deski, blachy, beton, zaprawa, klej, silikon, folia, papa, dachówka, okna, drzwi, i każdy inny produkt/towar wymieniony w dokumencie.
+
+Zwróć dane WYŁĄCZNIE w następującym formacie JSON:
+{
+  "materials": [
+    {
+      "name": "nazwa materiału",
+      "unit": "jednostka",
+      "quantity": liczba_ilości
+    }
+  ]
+}
+
+Przykłady poprawnego formatu:
+{
+  "materials": [
+    {"name": "Cement", "unit": "kilograms", "quantity": 100},
+    {"name": "Cegły", "unit": "pieces", "quantity": 500},
+    {"name": "Drewno", "unit": "cubic_meters", "quantity": 2.5}
+  ]
+}
+
+Wymagania:
+- Wyciągnij WSZYSTKIE materiały/produkty widoczne w dokumencie - nawet jeśli nie jesteś w 100% pewien, spróbuj wyciągnąć to co widzisz
+- Pole "name" - nazwa materiału/produktu (wymagane, użyj dokładnie takiej nazwy jak w dokumencie)
+- Pole "unit" - jednostka miary, MUSI być DOKŁADNIE jedną z poniższych wartości (wymagane):
+  * "meters" - metry (m, metr, metrów)
+  * "kilograms" - kilogramy (kg, kilogram, kilogramów)
+  * "cubic_meters" - metry sześcienne (m³, m3, metr sześcienny)
+  * "cubic_centimeters" - centymetry sześcienne (cm³, cm3, centymetr sześcienny)
+  * "cubic_millimeters" - milimetry sześcienne (mm³, mm3, milimetr sześcienny)
+  * "liters" - litry (l, L, litr, litrów)
+  * "pieces" - sztuki (szt, sztuk, sztuka, pcs, pieces)
+  * "other" - inne jednostki (użyj tylko gdy nie pasuje żadna z powyższych)
+  
+  WAŻNE: Użyj dokładnie jednej z powyższych wartości. Jeśli jednostka z dokumentu to np. "km" (kilometry), użyj "meters". Jeśli to "g" (gramy), użyj "kilograms". Jeśli to "ml" (mililitry), użyj "liters" lub "other" w zależności od kontekstu.
+- Pole "quantity" - ilość materiału jako liczba (wymagane, jeśli nie ma ilości użyj 0)
+  * UWAGA: Jeśli w dokumencie ilość jest zapisana z przecinkiem (np. "100,5"), zamień przecinek na kropkę (100.5)
+  * Przykłady: "100,5" -> 100.5, "50,25" -> 50.25, "2,75" -> 2.75
+- Jeśli w dokumencie nie ma żadnych materiałów/produktów, zwróć pustą tablicę: {"materials": []}
+
+Ważne - interpretacja kolumn i danych:
+- Dokument może mieć kolumny o różnych nazwach (np. "ilość", "quantity", "qty", "ilość sztuk", "ilość kg", "nazwa", "materiał", "produkt", "towar", "artykuł", "pozycja", itp.)
+- Spróbuj z kontekstu zidentyfikować, które kolumny odpowiadają wymaganym polom:
+  * Kolumna z nazwą materiału/produktu -> "name"
+  * Kolumna z ilością/liczbą -> "quantity" (pamiętaj o zamianie przecinka na kropkę)
+  * Kolumna z jednostką miary lub jednostka wywnioskowana z kontekstu -> "unit"
+- Jeśli jednostka nie jest podana bezpośrednio, spróbuj wywnioskować ją z kontekstu:
+  * "100 kg" lub "100kg" -> unit: "kilograms", quantity: 100
+  * "50 szt" lub "50szt" -> unit: "pieces", quantity: 50
+  * "2 m3" lub "2m3" -> unit: "cubic_meters", quantity: 2
+  * "10 m" lub "10m" -> unit: "meters", quantity: 10
+  * "5 l" lub "5l" -> unit: "liters", quantity: 5
+  * "100,5 kg" -> unit: "kilograms", quantity: 100.5
+- Jeśli widzisz listę produktów/materiałów w dokumencie (nawet w formie tekstowej), wyciągnij je wszystkie
+- Jeśli nie możesz jednoznacznie zidentyfikować pola, użyj najlepszego dopasowania na podstawie kontekstu
+- NIE zwracaj pustej tablicy jeśli widzisz jakiekolwiek materiały/produkty w dokumencie - zawsze spróbuj je wyciągnąć
 
 Odpowiedź powinna być wyłącznie w formacie JSON, bez dodatkowych komentarzy."""
 
