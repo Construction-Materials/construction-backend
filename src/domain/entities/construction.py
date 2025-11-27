@@ -21,6 +21,7 @@ class Construction:
         address: str = "",
         start_date: Optional[datetime] = None,
         status: ConstructionStatus = ConstructionStatus.INACTIVE,
+        img_url: Optional[str] = None,
         created_at: Optional[datetime] = None
     ):
         """Initialize Construction entity."""
@@ -33,6 +34,7 @@ class Construction:
         self._address = address
         self._start_date = start_date
         self._status = status
+        self._img_url = img_url
         self._created_at = created_at or datetime.utcnow()
     
     @property
@@ -66,6 +68,11 @@ class Construction:
         return self._status
     
     @property
+    def img_url(self) -> Optional[str]:
+        """Get construction image URL."""
+        return self._img_url
+    
+    @property
     def created_at(self) -> datetime:
         """Get creation timestamp."""
         return self._created_at
@@ -94,7 +101,11 @@ class Construction:
     
     def set_status(self, status: ConstructionStatus) -> None:
         """Set construction status."""
-        self._status = status   
+        self._status = status
+    
+    def set_img_url(self, img_url: Optional[str]) -> None:
+        """Set construction image URL."""
+        self._img_url = img_url.strip() if img_url and img_url.strip() else None   
     
     def __eq__(self, other) -> bool:
         """Check equality with another construction."""

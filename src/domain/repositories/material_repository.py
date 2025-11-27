@@ -61,4 +61,9 @@ class MaterialRepository(ABC):
     async def get_by_construction_id(self, construction_id: UUID, limit: int = 100, offset: int = 0) -> List[Materials]:
         """Get materials by construction ID (through storages)."""
         pass
+    
+    @abstractmethod
+    async def get_by_name(self, name: str) -> Optional[Materials]:
+        """Get material by exact name match (case-insensitive)."""
+        pass
 

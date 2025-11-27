@@ -33,6 +33,7 @@ class ConstructionModel(Base):
     address = Column(String(255), nullable=False, default="")
     start_date = Column(DateTime, nullable=True)
     status = Column(String(20), nullable=False, default="INACTIVE")
+    img_url = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=func.now(), nullable=False)
     
     # Relationships

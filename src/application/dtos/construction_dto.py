@@ -19,6 +19,7 @@ class ConstructionCreateDTO(BaseModel):
         default=ConstructionStatus.INACTIVE,
         description="Construction status"
     )
+    img_url: Optional[str] = Field(None, max_length=500, description="Construction image URL")
 
 
 class ConstructionUpdateDTO(BaseModel):
@@ -28,6 +29,7 @@ class ConstructionUpdateDTO(BaseModel):
     address: Optional[str] = Field(None, max_length=255, description="Construction address")
     start_date: Optional[datetime] = Field(None, description="Construction start date")
     status: Optional[ConstructionStatus] = Field(None, description="Construction status")
+    img_url: Optional[str] = Field(None, max_length=500, description="Construction image URL")
 
 
 class ConstructionResponseDTO(BaseModel):
@@ -38,6 +40,7 @@ class ConstructionResponseDTO(BaseModel):
     address: str = Field(..., description="Construction address")
     start_date: Optional[datetime] = Field(None, description="Construction start date")
     status: ConstructionStatus = Field(..., description="Construction status")
+    img_url: Optional[str] = Field(None, description="Construction image URL")
     created_at: datetime = Field(..., description="Creation timestamp")
     
     class Config:

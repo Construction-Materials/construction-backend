@@ -3,9 +3,9 @@ Material DTOs for Application Layer.
 """
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Union
 from uuid import UUID
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from src.domain.value_objects.unit_enum import UnitEnum
 
 
@@ -18,6 +18,16 @@ class MaterialCreateDTO(BaseModel):
         default=UnitEnum.OTHER,
         description="Material unit"
     )
+    
+    @field_validator('unit', mode='before')
+    @classmethod
+    def normalize_unit(cls, v: Union[str, UnitEnum]) -> UnitEnum:
+        """Normalize unit string to UnitEnum."""
+        if isinstance(v, UnitEnum):
+            return v
+        if isinstance(v, str):
+            return UnitEnum.normalize(v)
+        return UnitEnum.OTHER
 
 
 class MaterialUpdateDTO(BaseModel):
@@ -26,6 +36,18 @@ class MaterialUpdateDTO(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100, description="Material name")
     description: Optional[str] = Field(None, description="Material description")
     unit: Optional[UnitEnum] = Field(None, description="Material unit")
+    
+    @field_validator('unit', mode='before')
+    @classmethod
+    def normalize_unit(cls, v: Union[str, UnitEnum, None]) -> Optional[UnitEnum]:
+        """Normalize unit string to UnitEnum."""
+        if v is None:
+            return None
+        if isinstance(v, UnitEnum):
+            return v
+        if isinstance(v, str):
+            return UnitEnum.normalize(v)
+        return UnitEnum.OTHER
 
 
 class MaterialResponseDTO(BaseModel):

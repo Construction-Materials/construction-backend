@@ -33,7 +33,8 @@ class ConstructionUseCases:
             description=construction_dto.description,
             address=construction_dto.address,
             start_date=construction_dto.start_date,
-            status=DomainStatus(construction_dto.status.value)
+            status=DomainStatus(construction_dto.status.value),
+            img_url=construction_dto.img_url
         )
         
         # Save to repository
@@ -46,6 +47,7 @@ class ConstructionUseCases:
             address=created_construction.address,
             start_date=created_construction.start_date,
             status=ConstructionStatus(created_construction.status),
+            img_url=created_construction.img_url,
             created_at=created_construction.created_at
         )
     
@@ -62,6 +64,7 @@ class ConstructionUseCases:
             address=construction.address,
             start_date=construction.start_date,
             status=ConstructionStatus(construction.status),
+            img_url=construction.img_url,
             created_at=construction.created_at
         )
     
@@ -87,6 +90,9 @@ class ConstructionUseCases:
         if construction_dto.status is not None:
             construction._status = construction_dto.status.value
         
+        if construction_dto.img_url is not None:
+            construction.set_img_url(construction_dto.img_url)
+        
         # Save changes
         updated_construction = await self._construction_repository.update(construction)
         
@@ -97,6 +103,7 @@ class ConstructionUseCases:
             address=updated_construction.address,
             start_date=updated_construction.start_date,
             status=ConstructionStatus(updated_construction.status),
+            img_url=updated_construction.img_url,
             created_at=updated_construction.created_at
         )
     
@@ -122,6 +129,7 @@ class ConstructionUseCases:
                     address=construction.address,
                     start_date=construction.start_date,
                     status=ConstructionStatus(construction.status),
+                    img_url=construction.img_url,
                     created_at=construction.created_at
                 )
                 for construction in constructions
@@ -158,6 +166,7 @@ class ConstructionUseCases:
                     address=construction.address,
                     start_date=construction.start_date,
                     status=ConstructionStatus(construction.status),
+                    img_url=construction.img_url,
                     created_at=construction.created_at
                 )
                 for construction in constructions

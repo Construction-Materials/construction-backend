@@ -2,10 +2,16 @@
 Construction API endpoints.
 """
 
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
+import os
+import shutil
+import base64
+from pathlib import Path
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Request
 from uuid import UUID
 from rapidfuzz import fuzz
+
+from src.shared.config import settings
 
 from src.application.dtos.construction_dto import (
     ConstructionCreateDTO,
@@ -36,11 +42,216 @@ async def list_constructions_public(
 
 @router.post("/", response_model=ConstructionResponseDTO, status_code=status.HTTP_201_CREATED)
 async def create_construction(
-    construction_dto: ConstructionCreateDTO,
+    request: Request,
     construction_use_cases: ConstructionUseCases = Depends(get_construction_use_cases)
 ):
-    """Create a new construction."""
-    return await construction_use_cases.create_construction(construction_dto)
+    """
+    Utwórz nową construction.
+    
+    Obsługuje dwa formaty:
+    1. JSON (Content-Type: application/json) - standardowy ConstructionCreateDTO
+    2. Multipart/form-data - z opcjonalnym plikiem zdjęcia
+    
+    Jeśli przesłasz plik w multipart/form-data, zostanie on zapisany i img_url zostanie ustawiony automatycznie.
+    """
+    content_type = request.headers.get("content-type", "")
+    
+    if "multipart/form-data" in content_type:
+        # Obsługa multipart/form-data z plikiem
+        form = await request.form()
+        
+        name = form.get("name")
+        if not name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Pole 'name' jest wymagane"
+            )
+        
+        description = form.get("description", "")
+        address = form.get("address", "")
+        start_date_str = form.get("start_date")
+        status_str = form.get("status", "inactive")
+        img_url = form.get("img_url")
+        file = form.get("file")
+        
+        from datetime import datetime
+        from src.application.dtos.construction_dto import ConstructionStatus
+        
+        # Parsuj start_date jeśli podano
+        parsed_start_date = None
+        if start_date_str:
+            try:
+                parsed_start_date = datetime.fromisoformat(start_date_str.replace('Z', '+00:00'))
+            except ValueError:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Nieprawidłowy format start_date. Użyj formatu ISO (np. 2024-01-01T00:00:00)"
+                )
+        
+        # Parsuj status
+        try:
+            status_enum = ConstructionStatus(status_str)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Nieprawidłowy status: {status_str}. Dozwolone wartości: {[s.value for s in ConstructionStatus]}"
+            )
+        
+        # Jeśli przesłano plik, zapisz go
+        final_img_url = img_url
+        temp_file_path = None
+        upload_dir = None
+        is_base64_image = False
+        
+        # Sprawdź czy img_url zawiera base64 image
+        if img_url and isinstance(img_url, str) and img_url.startswith("data:image/"):
+            is_base64_image = True
+            try:
+                # Parsuj base64 (format: data:image/jpeg;base64,/9j/4AAQ...)
+                header, encoded = img_url.split(",", 1)
+                # Wyciągnij typ obrazu z headera
+                mime_type = header.split(";")[0].split(":")[1]  # image/jpeg
+                file_extension_map = {
+                    "image/jpeg": "jpg",
+                    "image/jpg": "jpg",
+                    "image/png": "png",
+                    "image/gif": "gif",
+                    "image/webp": "webp"
+                }
+                file_extension = file_extension_map.get(mime_type, "jpg")
+                
+                # Dekoduj base64
+                file_content = base64.b64decode(encoded)
+                
+                # Sprawdź rozmiar
+                max_size = settings.max_upload_size_mb * 1024 * 1024
+                if len(file_content) > max_size:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Obraz base64 jest za duży. Maksymalny rozmiar: {settings.max_upload_size_mb}MB"
+                    )
+                
+                # Utwórz katalog jeśli nie istnieje
+                upload_dir = Path(settings.constructions_images_dir)
+                upload_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Generuj tymczasową nazwę pliku
+                temp_file_name = f"temp_base64.{file_extension}"
+                temp_file_path = upload_dir / temp_file_name
+                
+                # Zapisz plik tymczasowo
+                with open(temp_file_path, "wb") as buffer:
+                    buffer.write(file_content)
+                
+                # Ustaw final_img_url na None, bo będzie ustawiony później
+                final_img_url = None
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Nieprawidłowy format base64 image: {str(e)}"
+                )
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Błąd podczas przetwarzania base64 image: {str(e)}"
+                )
+        
+        if file and hasattr(file, 'filename') and file.filename:
+            # Walidacja typu pliku
+            allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+            file_extension = file.filename.lower().split('.')[-1] if '.' in file.filename else ''
+            
+            if file_extension not in allowed_extensions:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Nieobsługiwany typ pliku: {file_extension}. Dozwolone typy: {', '.join(allowed_extensions)}"
+                )
+            
+            # Sprawdź rozmiar pliku
+            max_size = settings.max_upload_size_mb * 1024 * 1024
+            file_content = await file.read()
+            
+            if len(file_content) > max_size:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Plik jest za duży. Maksymalny rozmiar: {settings.max_upload_size_mb}MB"
+                )
+            
+            # Utwórz katalog jeśli nie istnieje
+            upload_dir = Path(settings.constructions_images_dir)
+            upload_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Generuj tymczasową nazwę pliku
+            temp_file_name = f"temp_{file.filename}"
+            temp_file_path = upload_dir / temp_file_name
+            
+            # Zapisz plik tymczasowo
+            try:
+                with open(temp_file_path, "wb") as buffer:
+                    buffer.write(file_content)
+            except Exception as e:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Błąd podczas zapisywania pliku: {str(e)}"
+                )
+        
+        # Utwórz DTO
+        construction_dto = ConstructionCreateDTO(
+            name=name,
+            description=description,
+            address=address,
+            start_date=parsed_start_date,
+            status=status_enum,
+            img_url=final_img_url
+        )
+        
+        # Utwórz construction
+        created_construction = await construction_use_cases.create_construction(construction_dto)
+        
+        # Jeśli był plik lub base64 image, zmień nazwę na właściwą i zaktualizuj img_url
+        if (file and hasattr(file, 'filename') and file.filename and temp_file_path) or (is_base64_image and temp_file_path):
+            final_file_name = f"{created_construction.construction_id}_{file.filename}"
+            final_file_path = upload_dir / final_file_name
+            
+            try:
+                # Określ nazwę pliku
+                if is_base64_image:
+                    # Dla base64 użyj construction_id i rozszerzenia z pliku
+                    file_extension = temp_file_path.suffix
+                    final_file_name = f"{created_construction.construction_id}{file_extension}"
+                else:
+                    final_file_name = f"{created_construction.construction_id}_{file.filename}"
+                
+                final_file_path = upload_dir / final_file_name
+                
+                # Zmień nazwę pliku
+                if temp_file_path.exists():
+                    temp_file_path.rename(final_file_path)
+                
+                # Generuj URL
+                image_url = f"/api/v1/constructions/images/{final_file_name}"
+                
+                # Zaktualizuj construction z img_url
+                update_dto = ConstructionUpdateDTO(img_url=image_url)
+                created_construction = await construction_use_cases.update_construction(
+                    created_construction.construction_id,
+                    update_dto
+                )
+            except Exception as e:
+                # Jeśli błąd, usuń tymczasowy plik
+                if temp_file_path and temp_file_path.exists():
+                    temp_file_path.unlink()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Błąd podczas aktualizacji img_url: {str(e)}"
+                )
+        
+        return created_construction
+    else:
+        # Obsługa JSON (standardowy ConstructionCreateDTO)
+        body = await request.json()
+        construction_dto = ConstructionCreateDTO(**body)
+        return await construction_use_cases.create_construction(construction_dto)
 
 
 @router.get("/{construction_id}", response_model=ConstructionResponseDTO)
@@ -235,4 +446,93 @@ async def analyze_document(
         result["extracted_data"]["materials"] = enriched_materials
     
     return result
+
+
+@router.post("/{construction_id}/upload-image", response_model=ConstructionResponseDTO)
+async def upload_construction_image(
+    construction_id: UUID,
+    file: UploadFile = File(..., description="Zdjęcie construction (JPG, PNG, GIF, WEBP)"),
+    construction_use_cases: ConstructionUseCases = Depends(get_construction_use_cases)
+):
+    """
+    Prześlij zdjęcie dla construction i zapisz je na dysku.
+    
+    Akceptuje pliki obrazów (JPG, PNG, GIF, WEBP) i zapisuje je w katalogu uploads/constructions/.
+    Automatycznie aktualizuje pole img_url w construction.
+    """
+    # Sprawdź czy construction istnieje
+    try:
+        construction = await construction_use_cases.get_construction_by_id(construction_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Construction o ID {construction_id} nie został znaleziony"
+        )
+    
+    # Walidacja typu pliku
+    allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+    file_extension = file.filename.lower().split('.')[-1] if '.' in file.filename else ''
+    
+    if file_extension not in allowed_extensions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Nieobsługiwany typ pliku: {file_extension}. Dozwolone typy: {', '.join(allowed_extensions)}"
+        )
+    
+    # Sprawdź rozmiar pliku (max 10MB)
+    max_size = settings.max_upload_size_mb * 1024 * 1024
+    file_content = await file.read()
+    
+    if len(file_content) > max_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Plik jest za duży. Maksymalny rozmiar: {settings.max_upload_size_mb}MB"
+        )
+    
+    # Utwórz katalog jeśli nie istnieje
+    upload_dir = Path(settings.constructions_images_dir)
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generuj unikalną nazwę pliku
+    file_name = f"{construction_id}_{file.filename}"
+    file_path = upload_dir / file_name
+    
+    # Zapisz plik na dysku
+    try:
+        with open(file_path, "wb") as buffer:
+            buffer.write(file_content)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Błąd podczas zapisywania pliku: {str(e)}"
+        )
+    
+    # Generuj URL do pliku (względny URL)
+    image_url = f"/api/v1/constructions/images/{file_name}"
+    
+    # Zaktualizuj construction z nowym img_url
+    update_dto = ConstructionUpdateDTO(img_url=image_url)
+    updated_construction = await construction_use_cases.update_construction(construction_id, update_dto)
+    
+    return updated_construction
+
+
+@router.get("/images/{filename}")
+async def get_construction_image(filename: str):
+    """
+    Pobierz zdjęcie construction z dysku.
+    """
+    file_path = Path(settings.constructions_images_dir) / filename
+    
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Zdjęcie nie zostało znalezione"
+        )
+    
+    from fastapi.responses import FileResponse
+    return FileResponse(
+        path=str(file_path),
+        media_type="image/jpeg"  # FastAPI automatycznie wykryje typ na podstawie rozszerzenia
+    )
 

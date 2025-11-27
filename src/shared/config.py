@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "json"
     
+    # File Uploads
+    uploads_dir: str = "./uploads"
+    constructions_images_dir: str = "./uploads/constructions"
+    max_upload_size_mb: int = 10
+    
     class Config:
         env_file = ".env"
         case_sensitive = False

@@ -26,6 +26,11 @@ class MaterialUseCases:
     
     async def create_material(self, material_dto: MaterialCreateDTO) -> MaterialResponseDTO:
         """Create a new material."""
+        # Check if material with this name already exists
+        existing_material = await self._material_repository.get_by_name(material_dto.name)
+        if existing_material:
+            raise ValidationError(f"Material with name '{material_dto.name}' already exists in the database")
+        
         # Create domain entity
         material = Materials(
             category_id=material_dto.category_id,
@@ -48,6 +53,22 @@ class MaterialUseCases:
     
     async def create_materials_bulk(self, material_dtos: List[MaterialCreateDTO]) -> List[MaterialResponseDTO]:
         """Create multiple materials at once."""
+        # Check for duplicates in the list
+        names = [dto.name for dto in material_dtos]
+        duplicates = [name for name in names if names.count(name) > 1]
+        if duplicates:
+            raise ValidationError(f"Duplicate names in materials list: {', '.join(set(duplicates))}")
+        
+        # Check if any of the materials already exist in the database
+        existing_names = []
+        for material_dto in material_dtos:
+            existing_material = await self._material_repository.get_by_name(material_dto.name)
+            if existing_material:
+                existing_names.append(material_dto.name)
+        
+        if existing_names:
+            raise ValidationError(f"Materials with the following names already exist in the database: {', '.join(existing_names)}")
+        
         # Create domain entities
         materials = [
             Materials(

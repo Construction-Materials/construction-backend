@@ -235,6 +235,20 @@ class MaterialRepositoryImpl(MaterialRepository):
         except Exception as e:
             raise DatabaseError(f"Failed to get materials by construction ID: {str(e)}") from e
     
+    async def get_by_name(self, name: str) -> Optional[Materials]:
+        """Get material by exact name match (case-insensitive)."""
+        try:
+            result = await self._session.execute(
+                select(MaterialModel)
+                .where(func.lower(MaterialModel.name) == func.lower(name))
+                .limit(1)
+            )
+            material_model = result.scalar_one_or_none()
+            
+            return self._to_domain(material_model) if material_model else None
+        except Exception as e:
+            raise DatabaseError(f"Failed to get material by name: {str(e)}") from e
+    
     def _to_domain(self, material_model: MaterialModel) -> Materials:
         """Convert SQLAlchemy model to domain entity."""
         return Materials(
