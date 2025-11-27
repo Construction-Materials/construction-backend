@@ -19,13 +19,31 @@ from src.infrastructure.api.dependencies import get_storage_item_use_cases
 router = APIRouter()
 
 
-@router.post("/", response_model=StorageItemResponseDTO, status_code=status.HTTP_201_CREATED)
-async def create_storage_item(
-    storage_item_dto: StorageItemCreateDTO,
+# More specific endpoints first (with more path segments)
+@router.post("/construction/{construction_id}/bulk", response_model=List[StorageItemResponseDTO], status_code=status.HTTP_201_CREATED)
+async def create_storage_items_bulk_for_construction(
+    construction_id: UUID,
+    storage_item_dtos: List[StorageItemCreateDTO],
     storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
 ):
-    """Create a new storage item."""
-    return await storage_item_use_cases.create_storage_item(storage_item_dto)
+    """Create multiple storage items at once for a given construction.
+    
+    Validates that all construction_ids in the request match the given construction_id.
+    If storage item already exists, adds quantity_value to existing one.
+    """
+    return await storage_item_use_cases.create_storage_items_bulk_for_construction(
+        construction_id=construction_id,
+        storage_item_dtos=storage_item_dtos
+    )
+
+
+@router.get("/construction/{construction_id}/materials", response_model=StorageItemMaterialListResponseDTO)
+async def get_materials_by_construction(
+    construction_id: UUID,
+    storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
+):
+    """Get list of materials (name, category, description, unit) for each storage item for given construction ID."""
+    return await storage_item_use_cases.get_materials_by_construction_id(construction_id)
 
 
 @router.get("/construction/{construction_id}/material/{material_id}", response_model=StorageItemResponseDTO)
@@ -59,6 +77,7 @@ async def delete_storage_item(
     await storage_item_use_cases.delete_storage_item(construction_id, material_id)
 
 
+# Less specific endpoints (with fewer path segments) - must be after more specific ones
 @router.get("/construction/{construction_id}", response_model=StorageItemListResponseDTO)
 async def get_storage_items_by_construction(
     construction_id: UUID,
@@ -89,27 +108,11 @@ async def get_storage_items_by_material(
     )
 
 
-@router.get("/construction/{construction_id}/materials", response_model=StorageItemMaterialListResponseDTO)
-async def get_materials_by_construction(
-    construction_id: UUID,
+@router.post("/", response_model=StorageItemResponseDTO, status_code=status.HTTP_201_CREATED)
+async def create_storage_item(
+    storage_item_dto: StorageItemCreateDTO,
     storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
 ):
-    """Get list of materials (name, category, description, unit) for each storage item for given construction ID."""
-    return await storage_item_use_cases.get_materials_by_construction_id(construction_id)
-
-
-@router.post("/construction/{construction_id}/bulk", response_model=List[StorageItemResponseDTO], status_code=status.HTTP_201_CREATED)
-async def create_storage_items_bulk_for_construction(
-    construction_id: UUID,
-    storage_item_dtos: List[StorageItemCreateDTO],
-    storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
-):
-    """Create multiple storage items at once for a given construction.
-    
-    Validates that all construction_ids in the request match the given construction_id.
-    """
-    return await storage_item_use_cases.create_storage_items_bulk_for_construction(
-        construction_id=construction_id,
-        storage_item_dtos=storage_item_dtos
-    )
+    """Create a new storage item."""
+    return await storage_item_use_cases.create_storage_item(storage_item_dto)
 
