@@ -52,26 +52,42 @@ construction-backend/
 
 ## Setup
 
-1. **Instalacja zależności:**
+1. **Utworzenie wirtualnego środowiska:**
+
+```bash
+python -m venv venv
+```
+
+2. **Aktywacja wirtualnego środowiska:**
+
+```bash
+# Na macOS/Linux:
+source venv/bin/activate
+
+# Na Windows:
+venv\Scripts\activate
+```
+
+3. **Instalacja zależności:**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. **Konfiguracja środowiska:**
+4. **Konfiguracja środowiska:**
 
 ```bash
 cp env.example .env
 # Edytuj .env z odpowiednimi wartościami
 ```
 
-3. **Migracje bazy danych:**
+5. **Migracje bazy danych:**
 
 ```bash
 alembic upgrade head
 ```
 
-4. **Uruchomienie aplikacji:**
+6. **Uruchomienie aplikacji:**
 
 ```bash
 python main.py
