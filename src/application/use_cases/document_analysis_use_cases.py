@@ -7,6 +7,7 @@ from uuid import UUID
 import base64
 import json
 
+import fitz  # PyMuPDF
 from openai import OpenAI
 from src.shared.config import settings
 from src.shared.exceptions import ValidationError
@@ -15,62 +16,8 @@ from src.shared.exceptions import ValidationError
 class DocumentAnalysisUseCases:
     """Document analysis use cases implementation."""
     
-    def __init__(self):
-        if not settings.openai_api_key:
-            raise ValueError("OpenAI API key is not configured")
-        self._client = OpenAI(api_key=settings.openai_api_key)
-    
-    async def analyze_document(
-        self, 
-        file_content: bytes, 
-        file_name: str,
-        construction_id: UUID
-    ) -> Dict[str, Any]:
-        """
-        Analyze document (image or PDF) using OpenAI Vision API.
-        
-        Args:
-            file_content: Binary content of the file
-            file_name: Name of the file
-            construction_id: ID of the construction this document is associated with
-        
-        Returns:
-            Dictionary with extracted data in JSON format
-        """
-        # Validate file type
-        file_extension = file_name.lower().split('.')[-1] if '.' in file_name else ''
-        allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf']
-        
-        if file_extension not in allowed_extensions:
-            raise ValidationError(
-                f"Nieobsługiwany typ pliku: {file_extension}. "
-                f"Dozwolone typy: {', '.join(allowed_extensions)}"
-            )
-        
-        # Prepare file for OpenAI API
-        if file_extension == 'pdf':
-            # For PDF, we need to use a different approach
-            # OpenAI Vision API doesn't directly support PDF, so we'll need to convert it
-            # For now, we'll raise an error and suggest using images
-            raise ValidationError(
-                "PDF nie jest obecnie obsługiwany. Proszę przekonwertować PDF na obraz."
-            )
-        
-        # Encode image to base64
-        base64_image = base64.b64encode(file_content).decode('utf-8')
-        
-        # Determine MIME type
-        mime_type_map = {
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'gif': 'image/gif',
-            'webp': 'image/webp'
-        }
-        mime_type = mime_type_map.get(file_extension, 'image/jpeg')
-        
-        # Prepare prompt for OpenAI
-        prompt = """Przeanalizuj ten dokument/zdjęcie i wyciągnij WSZYSTKIE materiały (produkty, towary, składniki) z ich ilościami.
+    # Prompt for material extraction from documents
+    _MATERIAL_EXTRACTION_PROMPT = """Przeanalizuj ten dokument/zdjęcie i wyciągnij WSZYSTKIE materiały (produkty, towary, składniki) z ich ilościami.
 
 Materiałem może być: cement, cegły, drewno, stal, farba, gips, piasek, żwir, kafelki, rury, kable, druty, śruby, gwoździe, izolacja, płyty, deski, blachy, beton, zaprawa, klej, silikon, folia, papa, dachówka, okna, drzwi, i każdy inny produkt/towar wymieniony w dokumencie.
 
@@ -131,7 +78,147 @@ Ważne - interpretacja kolumn i danych:
 - NIE zwracaj pustej tablicy jeśli widzisz jakiekolwiek materiały/produkty w dokumencie - zawsze spróbuj je wyciągnąć
 
 Odpowiedź powinna być wyłącznie w formacie JSON, bez dodatkowych komentarzy."""
-
+    
+    def __init__(self):
+        if not settings.openai_api_key:
+            raise ValueError("OpenAI API key is not configured")
+        self._client = OpenAI(api_key=settings.openai_api_key)
+    
+    async def analyze_document(
+        self, 
+        file_content: bytes, 
+        file_name: str,
+        construction_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Analyze document (image or PDF) using OpenAI Vision API.
+        
+        Args:
+            file_content: Binary content of the file
+            file_name: Name of the file
+            construction_id: ID of the construction this document is associated with
+        
+        Returns:
+            Dictionary with extracted data in JSON format
+        """
+        # Validate file type
+        file_extension = file_name.lower().split('.')[-1] if '.' in file_name else ''
+        allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf']
+        
+        if file_extension not in allowed_extensions:
+            raise ValidationError(
+                f"Nieobsługiwany typ pliku: {file_extension}. "
+                f"Dozwolone typy: {', '.join(allowed_extensions)}"
+            )
+        
+        # Prepare file for OpenAI API
+        if file_extension == 'pdf':
+            # Convert PDF to images and analyze all pages
+            return await self._analyze_pdf(file_content, file_name, construction_id)
+        
+        # Encode image to base64
+        base64_image = base64.b64encode(file_content).decode('utf-8')
+        
+        # Determine MIME type
+        mime_type_map = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'webp': 'image/webp'
+        }
+        mime_type = mime_type_map.get(file_extension, 'image/jpeg')
+        
+        # Analyze image using OpenAI Vision API
+        extracted_data = await self._call_openai_vision_api(base64_image, mime_type)
+        
+        # Add metadata
+        result = {
+            "construction_id": str(construction_id),
+            "file_name": file_name,
+            "extracted_data": extracted_data
+        }
+        
+        return result
+    
+    async def _analyze_pdf(
+        self,
+        file_content: bytes,
+        file_name: str,
+        construction_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Analyze PDF by converting pages to images and analyzing each page.
+        
+        Args:
+            file_content: Binary content of the PDF file
+            file_name: Name of the file
+            construction_id: ID of the construction this document is associated with
+        
+        Returns:
+            Dictionary with extracted data from all pages combined
+        """
+        try:
+            # Open PDF from bytes
+            pdf_document = fitz.open(stream=file_content, filetype="pdf")
+            total_pages = len(pdf_document)
+            all_materials = []
+            
+            # Process each page
+            for page_num in range(total_pages):
+                page = pdf_document[page_num]
+                
+                # Convert page to image (PNG format)
+                # Using zoom factor of 2.0 for better quality
+                mat = fitz.Matrix(2.0, 2.0)
+                pix = page.get_pixmap(matrix=mat)
+                img_bytes = pix.tobytes("png")
+                
+                # Analyze this page
+                page_result = await self._analyze_image_page(
+                    img_bytes,
+                    page_num + 1,
+                    total_pages
+                )
+                
+                # Collect materials from this page
+                if "materials" in page_result:
+                    all_materials.extend(page_result["materials"])
+            
+            pdf_document.close()
+            
+            # Combine results from all pages
+            extracted_data = {
+                "materials": all_materials
+            }
+            
+            result = {
+                "construction_id": str(construction_id),
+                "file_name": file_name,
+                "extracted_data": extracted_data,
+                "pages_processed": total_pages
+            }
+            
+            return result
+            
+        except Exception as e:
+            raise ValidationError(f"Błąd podczas przetwarzania PDF: {str(e)}")
+    
+    async def _call_openai_vision_api(
+        self,
+        base64_image: str,
+        mime_type: str
+    ) -> Dict[str, Any]:
+        """
+        Call OpenAI Vision API to analyze an image.
+        
+        Args:
+            base64_image: Base64 encoded image
+            mime_type: MIME type of the image
+        
+        Returns:
+            Dictionary with extracted data
+        """
         try:
             # Call OpenAI Vision API
             response = self._client.chat.completions.create(
@@ -142,7 +229,7 @@ Odpowiedź powinna być wyłącznie w formacie JSON, bez dodatkowych komentarzy.
                         "content": [
                             {
                                 "type": "text",
-                                "text": prompt
+                                "text": self._MATERIAL_EXTRACTION_PROMPT
                             },
                             {
                                 "type": "image_url",
@@ -170,15 +257,39 @@ Odpowiedź powinna być wyłącznie w formacie JSON, bez dodatkowych komentarzy.
                     "error": "Odpowiedź nie jest w formacie JSON"
                 }
             
-            # Add metadata
-            result = {
-                "construction_id": str(construction_id),
-                "file_name": file_name,
-                "extracted_data": extracted_data
-            }
-            
-            return result
+            return extracted_data
             
         except Exception as e:
-            raise ValidationError(f"Błąd podczas analizy dokumentu: {str(e)}")
+            raise ValidationError(f"Błąd podczas analizy obrazu: {str(e)}")
+    
+    async def _analyze_image_page(
+        self,
+        image_bytes: bytes,
+        page_num: int,
+        total_pages: int
+    ) -> Dict[str, Any]:
+        """
+        Analyze a single image page using OpenAI Vision API.
+        
+        Args:
+            image_bytes: Binary content of the image
+            page_num: Current page number (1-indexed)
+            total_pages: Total number of pages in the document
+        
+        Returns:
+            Dictionary with extracted data from this page
+        """
+        # Encode image to base64
+        base64_image = base64.b64encode(image_bytes).decode('utf-8')
+        mime_type = 'image/png'
+        
+        try:
+            extracted_data = await self._call_openai_vision_api(base64_image, mime_type)
+            return extracted_data
+        except Exception as e:
+            # Return empty materials on error for this page
+            return {
+                "materials": [],
+                "error": f"Błąd podczas analizy strony {page_num}: {str(e)}"
+            }
 

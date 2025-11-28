@@ -253,6 +253,8 @@ PyJWT==2.10.1
 pylint @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pylint_1699242870766/work
 pylint-venv @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_80rsj1kckp/croot/pylint-venv_1709837627074/work
 pyls-spyder==0.4.0
+PyMuPDF==1.24.0
+PyMuPDFb==1.24.0
 PyMySQL==1.1.1
 pyobjc-core @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_342uq4g0a3/croot/pyobjc-core_1710189033492/work
 pyobjc-framework-Cocoa @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_157_nv38zo/croot/pyobjc-framework-cocoa_1710191895205/work
