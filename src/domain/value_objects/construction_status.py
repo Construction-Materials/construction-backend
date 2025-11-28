@@ -13,4 +13,6 @@ class ConstructionStatus(str, Enum):
     ARCHIVED = "archived"
     DELETED = "deleted"
     COMPLETED = "completed"
+    PLANNED = "planned"
+
 

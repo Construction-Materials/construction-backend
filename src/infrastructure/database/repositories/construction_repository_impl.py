@@ -4,12 +4,13 @@ Construction Repository Implementation (Adapter).
 
 from typing import List, Optional
 from uuid import UUID
+from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func
 
 from src.domain.entities.construction import Construction
 from src.domain.repositories.construction_repository import ConstructionRepository
-from src.infrastructure.database.models import ConstructionModel
+from src.infrastructure.database.models import ConstructionModel, StorageItemModel
 from src.shared.exceptions import DatabaseError
 
 
@@ -124,6 +125,20 @@ class ConstructionRepositoryImpl(ConstructionRepository):
         except Exception as e:
             raise DatabaseError(f"Failed to search constructions by name: {str(e)}") from e
     
+    async def get_by_name(self, name: str) -> Optional[Construction]:
+        """Get construction by exact name match (case-insensitive)."""
+        try:
+            result = await self._session.execute(
+                select(ConstructionModel)
+                .where(func.lower(ConstructionModel.name) == func.lower(name))
+                .limit(1)
+            )
+            construction_model = result.scalar_one_or_none()
+            
+            return self._to_domain(construction_model) if construction_model else None
+        except Exception as e:
+            raise DatabaseError(f"Failed to get construction by name: {str(e)}") from e
+    
     async def count_all(self) -> int:
         """Count total number of constructions."""
         try:
@@ -133,6 +148,60 @@ class ConstructionRepositoryImpl(ConstructionRepository):
             return result.scalar() or 0
         except Exception as e:
             raise DatabaseError(f"Failed to count constructions: {str(e)}") from e
+    
+    async def get_statistics(self, from_date: Optional[datetime] = None) -> List[dict]:
+        """Get statistics for all constructions."""
+        try:
+            now = datetime.now(timezone.utc)
+            
+            # Buduj warunek join - jeśli podano from_date, dodaj go do warunku join
+            join_condition = ConstructionModel.construction_id == StorageItemModel.construction_id
+            if from_date is not None:
+                join_condition = join_condition & (StorageItemModel.created_at >= from_date)
+            
+            query = select(
+                ConstructionModel.construction_id,
+                ConstructionModel.name.label('construction_name'),
+                func.coalesce(
+                    func.count(func.distinct(StorageItemModel.material_id)),
+                    0
+                ).label('total_items'),
+                func.coalesce(func.sum(StorageItemModel.quantity_value), 0.0).label('total_quantity')
+            ).outerjoin(
+                StorageItemModel, 
+                join_condition
+            ).group_by(
+                ConstructionModel.construction_id, 
+                ConstructionModel.name
+            ).order_by(ConstructionModel.name)
+            
+            result = await self._session.execute(query)
+            rows = result.all()
+            
+            statistics = []
+            for row in rows:
+                # Obsługa total_items - count może zwrócić 0 lub None
+                total_items = 0
+                if row.total_items is not None:
+                    total_items = int(row.total_items)
+                
+                # Obsługa total_quantity - sum może zwrócić None lub 0
+                total_quantity = 0.0
+                if row.total_quantity is not None:
+                    total_quantity = float(row.total_quantity)
+                
+                statistics.append({
+                    'construction_id': row.construction_id,
+                    'construction_name': row.construction_name or None,
+                    'total_items': total_items,
+                    'total_quantity': total_quantity,
+                    'measured_at': now,
+                    'last_sync_at': now
+                })
+            
+            return statistics
+        except Exception as e:
+            raise DatabaseError(f"Failed to get construction statistics: {str(e)}") from e
     
     def _to_domain(self, construction_model: ConstructionModel) -> Construction:
         """Convert SQLAlchemy model to domain entity."""

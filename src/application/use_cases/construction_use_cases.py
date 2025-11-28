@@ -2,8 +2,9 @@
 Construction Use Cases for Application Layer.
 """
 
-from typing import List
+from typing import List, Optional
 from uuid import UUID
+from datetime import datetime
 
 from src.domain.entities.construction import Construction
 from src.domain.repositories.construction_repository import ConstructionRepository
@@ -13,7 +14,8 @@ from src.application.dtos.construction_dto import (
     ConstructionResponseDTO,
     ConstructionListResponseDTO,
     ConstructionSearchDTO,
-    ConstructionStatus
+    ConstructionStatus,
+    ConstructionStatisticsDTO
 )
 from src.shared.exceptions import EntityNotFoundError, ValidationError
 
@@ -26,6 +28,11 @@ class ConstructionUseCases:
     
     async def create_construction(self, construction_dto: ConstructionCreateDTO) -> ConstructionResponseDTO:
         """Create a new construction."""
+        # Check if construction with this name already exists
+        existing_construction = await self._construction_repository.get_by_name(construction_dto.name)
+        if existing_construction:
+            raise ValidationError(f"Construction with name '{construction_dto.name}' already exists in the database")
+        
         # Create domain entity
         from src.domain.value_objects.construction_status import ConstructionStatus as DomainStatus
         construction = Construction(
@@ -76,6 +83,10 @@ class ConstructionUseCases:
         
         # Update fields if provided
         if construction_dto.name is not None:
+            # Check if another construction with this name already exists
+            existing_construction = await self._construction_repository.get_by_name(construction_dto.name)
+            if existing_construction and existing_construction.id != construction_id:
+                raise ValidationError(f"Construction with name '{construction_dto.name}' already exists in the database")
             construction._name = construction_dto.name.strip()
         
         if construction_dto.description is not None:
@@ -175,4 +186,20 @@ class ConstructionUseCases:
             page=search_dto.page,
             size=search_dto.size
         )
+    
+    async def get_statistics(self, from_date: Optional[datetime] = None) -> List[ConstructionStatisticsDTO]:
+        """Get statistics for all constructions."""
+        statistics = await self._construction_repository.get_statistics(from_date=from_date)
+        
+        return [
+            ConstructionStatisticsDTO(
+                construction_id=stat['construction_id'],
+                construction_name=stat['construction_name'],
+                total_items=stat['total_items'],
+                total_quantity=stat['total_quantity'],
+                measured_at=stat['measured_at'],
+                last_sync_at=stat['last_sync_at']
+            )
+            for stat in statistics
+        ]
 

@@ -5,6 +5,7 @@ Construction Repository Interface (Port).
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from uuid import UUID
+from datetime import datetime
 
 from src.domain.entities.construction import Construction
 
@@ -44,6 +45,16 @@ class ConstructionRepository(ABC):
         pass
     
     @abstractmethod
+    async def get_by_name(self, name: str) -> Optional[Construction]:
+        """Get construction by exact name match (case-insensitive)."""
+        pass
+    
+    @abstractmethod
     async def count_all(self) -> int:
         """Count total number of constructions."""
+        pass
+    
+    @abstractmethod
+    async def get_statistics(self, from_date: Optional[datetime] = None) -> List[dict]:
+        """Get statistics for all constructions."""
         pass

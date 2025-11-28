@@ -63,3 +63,17 @@ class ConstructionSearchDTO(BaseModel):
     size: int = Field(default=20, ge=1, le=100, description="Page size")
     status: Optional[ConstructionStatus] = Field(None, description="Filter by status")
 
+
+class ConstructionStatisticsDTO(BaseModel):
+    """DTO for construction statistics."""
+    construction_id: UUID = Field(..., description="Construction ID")
+    construction_name: Optional[str] = Field(None, description="Construction name")
+    total_items: int = Field(default=0, description="Total number of unique materials")
+    total_quantity: float = Field(default=0.0, description="Total quantity of all materials")
+    measured_at: datetime = Field(..., description="Measurement timestamp")
+    last_sync_at: datetime = Field(..., description="Last synchronization timestamp")
+
+    class Config:
+        """Enables to create instances from SQLAlchemy models."""
+        from_attributes = True
+

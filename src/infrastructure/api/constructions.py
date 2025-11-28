@@ -7,6 +7,7 @@ import shutil
 import base64
 from pathlib import Path
 from typing import List, Optional
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Request
 from uuid import UUID
 from rapidfuzz import fuzz
@@ -18,7 +19,8 @@ from src.application.dtos.construction_dto import (
     ConstructionUpdateDTO,
     ConstructionResponseDTO,
     ConstructionListResponseDTO,
-    ConstructionSearchDTO
+    ConstructionSearchDTO,
+    ConstructionStatisticsDTO
 )
 from src.application.dtos.material_dto import MaterialSearchDTO
 from src.application.use_cases.construction_use_cases import ConstructionUseCases
@@ -74,7 +76,6 @@ async def create_construction(
         img_url = form.get("img_url")
         file = form.get("file")
         
-        from datetime import datetime
         from src.application.dtos.construction_dto import ConstructionStatus
         
         # Parsuj start_date jeśli podano
@@ -263,6 +264,39 @@ async def create_construction(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"{str(e)}"
             )
+
+
+@router.get("/statistics", response_model=List[ConstructionStatisticsDTO])
+async def get_construction_statistics(
+    from_date: Optional[datetime] = Query(None, description="Data od której mają być zbierane statystyki (format ISO 8601)"),
+    construction_use_cases: ConstructionUseCases = Depends(get_construction_use_cases)
+):
+    """
+    Pobierz statystyki dla wszystkich budów.
+    
+    Zwraca listę statystyk zawierającą:
+    - construction_id: ID budowy
+    - construction_name: Nazwa budowy
+    - total_items: Łączna liczba unikalnych materiałów
+    - total_quantity: Łączna ilość wszystkich materiałów
+    - measured_at: Data i czas pomiaru
+    - last_sync_at: Data i czas ostatniej synchronizacji
+    
+    Parametry:
+    - from_date: Opcjonalna data od której mają być zbierane statystyki. 
+                 Jeśli podano, uwzględniane są tylko materiały dodane od tej daty.
+                 Format: ISO 8601 (np. 2024-01-01T00:00:00)
+    """
+    try:
+        result = await construction_use_cases.get_statistics(from_date=from_date)
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Błąd podczas pobierania statystyk: {str(e)}"
+        )
 
 
 @router.get("/{construction_id}", response_model=ConstructionResponseDTO)
