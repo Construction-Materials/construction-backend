@@ -44,9 +44,9 @@ construction-backend/
 
 - **Backend**: FastAPI 0.115+
 - **ORM**: SQLAlchemy 2.0+
-- **Database**: SQLite (domyślnie), obsługa PostgreSQL przez konfigurację
+- **Database**: SQLite
 - **Migrations**: Alembic
-- **Testing**: pytest, pytest-asyncio
+- **Testing**: pytest
 - **AI Integration**: OpenAI API (analiza dokumentów)
 - **File Uploads**: Lokalne przechowywanie plików
 
@@ -78,8 +78,10 @@ pip install -r requirements.txt
 
 ```bash
 cp env.example .env
-# Edytuj .env z odpowiednimi wartościami
+# Edytuj .env z odpowiednimi wartościami (opcjonalnie)
 ```
+
+Aplikacja używa **SQLite** jako bazy danych - nie wymaga dodatkowej konfiguracji!
 
 5. **Migracje bazy danych:**
 
