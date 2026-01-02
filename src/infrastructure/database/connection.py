@@ -17,9 +17,9 @@ engine = create_engine(
     pool_pre_ping=True
 )
 
-# Create async engine for async operations (SQLite only)
+# Create async engine for async operations
 async_engine = create_async_engine(
-    settings.database_url.replace("sqlite://", "sqlite+aiosqlite://"),
+    settings.database_url.replace("postgresql://", "postgresql+asyncpg://"),
     echo=settings.debug,
     pool_pre_ping=True
 )

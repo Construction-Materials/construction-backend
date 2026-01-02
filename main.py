@@ -7,6 +7,7 @@ FastAPI application with Hexagonal Architecture for recipe extraction using AI.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from mangum import Mangum
 
 from src.infrastructure.database.connection import init_database
 from src.infrastructure.api.routes import api_router
@@ -64,7 +65,7 @@ def create_app() -> FastAPI:
 
 # Create application instance
 app = create_app()
-
+handler = Mangum(app)
 
 @app.get("/")
 async def root():
