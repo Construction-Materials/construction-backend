@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     port: int = 8000
     
     # Database
-    database_url: str = "postgresql://postgres:rootpassword@localhost:5431/construction-db"
+    database_url: str = "postgresql://postgres:rootpassword@localhost:5431/postgres"
     database_url_dev: Optional[str] = None
     
     # Security
