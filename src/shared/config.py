@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
     
-    # Database
-    database_url: str = "postgresql://postgres:rootpassword@localhost:5431/postgres"
+    # Database - Use RDS endpoint for production
+    database_url: str = "postgresql://postgres:rootpassword@postgres.cdoie4ussx4x.eu-north-1.rds.amazonaws.com:5432/postgres"
     database_url_dev: Optional[str] = None
     
     # Security
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # AWS
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
-    aws_region: str = "us-east-1"
+    aws_region: str = "eu-north-1"
     lambda_function_name: str = "construction-manager"
     
     # AI Integration
