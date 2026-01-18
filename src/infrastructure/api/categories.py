@@ -30,7 +30,7 @@ async def list_categories_public(
     return result.categories
 
 
-@router.post("/", response_model=CategoryResponseDTO, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=CategoryResponseDTO, status_code=status.HTTP_201_CREATED)
 async def create_category(
     category_dto: CategoryCreateDTO,
     category_use_cases: CategoryUseCases = Depends(get_category_use_cases)
@@ -67,7 +67,7 @@ async def delete_category(
     await category_use_cases.delete_category(category_id)
 
 
-@router.get("/", response_model=CategoryListResponseDTO)
+@router.get("", response_model=CategoryListResponseDTO)
 async def list_categories(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),

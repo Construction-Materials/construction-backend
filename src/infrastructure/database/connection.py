@@ -5,6 +5,7 @@ Database connection and session management.
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.pool import NullPool
 from src.shared.config import settings
 
 # Create base class for models
@@ -17,11 +18,11 @@ engine = create_engine(
     pool_pre_ping=True
 )
 
-# Create async engine for async operations
+# Create async engine for async operations (NullPool for Lambda compatibility)
 async_engine = create_async_engine(
     settings.database_url.replace("postgresql://", "postgresql+asyncpg://"),
     echo=settings.debug,
-    pool_pre_ping=True
+    poolclass=NullPool
 )
 
 # Create session factory

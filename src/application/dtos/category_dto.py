@@ -5,7 +5,11 @@ Category DTOs for Application Layer.
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from pydantic import BaseModel, Field
+"""
+Walidacja i Serializacja JSON
+"""
+from pydantic import BaseModel, Field 
+
 
 
 class CategoryCreateDTO(BaseModel):

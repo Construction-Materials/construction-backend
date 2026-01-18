@@ -30,7 +30,7 @@ async def list_materials_public(
     return result.materials
 
 
-@router.post("/", response_model=MaterialResponseDTO, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=MaterialResponseDTO, status_code=status.HTTP_201_CREATED)
 async def create_material(
     material_dto: MaterialCreateDTO,
     material_use_cases: MaterialUseCases = Depends(get_material_use_cases)
@@ -76,7 +76,7 @@ async def delete_material(
     await material_use_cases.delete_material(material_id)
 
 
-@router.get("/", response_model=MaterialListResponseDTO)
+@router.get("", response_model=MaterialListResponseDTO)
 async def list_materials(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),

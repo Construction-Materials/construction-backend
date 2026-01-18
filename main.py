@@ -5,7 +5,6 @@ FastAPI application with Hexagonal Architecture for recipe extraction using AI.
 """
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from mangum import Mangum
 
@@ -39,18 +38,12 @@ def create_app() -> FastAPI:
         title="Construction Manager",
         description="Backend API for managing construction projects with Hexagonal Architecture",
         version="1.0.0",
-        lifespan=lifespan
+        lifespan=lifespan,
+        redirect_slashes=False
     )
     
-    # CORS Configuration
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["http://localhost:3000", "http://localhost:8080"],  # Frontend URLs
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    
+    # CORS is handled by Lambda Function URL configuration
+
     # Include API routes
     app.include_router(api_router, prefix="/api/v1")
     
@@ -65,7 +58,7 @@ def create_app() -> FastAPI:
 
 # Create application instance
 app = create_app()
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off")
 
 @app.get("/")
 async def root():

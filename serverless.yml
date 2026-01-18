@@ -1,0 +1,42 @@
+service: construction-manager
+
+provider:
+  name: aws
+  region: eu-north-1
+  stage: ${opt:stage, 'dev'}
+  timeout: 30
+  memorySize: 512
+
+  # Environment variables
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY, ''}
+    LOG_LEVEL: INFO
+
+  # VPC Configuration - uzupelnij swoimi wartosciami z RDS
+  vpc:
+    securityGroupIds:
+      - ${env:LAMBDA_SECURITY_GROUP_ID}
+    subnetIds:
+      - ${env:SUBNET_ID_1}
+      - ${env:SUBNET_ID_2}
+
+functions:
+  api:
+    image:
+      uri: ${env:ECR_IMAGE_URI}
+    url:
+      cors:
+        allowedOrigins:
+          - '*'
+        allowedMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        allowedHeaders:
+          - Content-Type
+          - Authorization
+    events:
+      - httpApi: '*'

@@ -108,7 +108,7 @@ async def get_storage_items_by_material(
     )
 
 
-@router.post("/", response_model=StorageItemResponseDTO, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=StorageItemResponseDTO, status_code=status.HTTP_201_CREATED)
 async def create_storage_item(
     storage_item_dto: StorageItemCreateDTO,
     storage_item_use_cases: StorageItemUseCases = Depends(get_storage_item_use_cases)
